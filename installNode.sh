@@ -7,33 +7,16 @@
 RELEASE="heatledger-2.3.2"
 RELEASE_URL="https://github.com/Heat-Ledger-Ltd/heatledger/releases/download/v2.3.2/heatledger-2.3.2.zip"
 
-INSTALL_DIR="/home/$HEAT_USER"
-BASE_DIR="$INSTALL_DIR/HeatLedger"
-VER_DIR="$BASE_DIR/$RELEASE"
-CONF_DIR="$VER_DIR/conf"
-BIN_DIR="$VER_DIR/bin"
-
-CONF="$CONF_DIR/heat.properties"
-BIN="$BIN_DIR/heatledger"
-SVC="$BASE_DIR/heatLedger.service"
-SYS_SVC="/etc/systemd/system/heatLedger.service"
-STRT="$BASE_DIR/startHeatLedger.sh"
-STRT_MINING="$BASE_DIR/startMining.sh"
-DELY_MINING="$BASE_DIR/delayMining.sh"
-MINING_INFO="$BASE_DIR/miningInfo.sh"
-GET_HALLMARK="$BASE_DIR/getHallmark.sh"
-HELP="$BASE_DIR/help.sh"
-
 HEAT_USER=$USER #user to run the node with, defaults to user that runs the script. to set a different user change here or pass in as argument, if user does not exist it will be created
-PASSWORD="" #password for creating a new user, if new user is created without changing the password here or passing in as argument you will need to set the password yourself after running this script
-API_KEY="changeMePlease"#Default api key, please change or pass in as argument
+PASSWORD= #password for creating a new user, if new user is created without changing the password here or passing in as argument you will need to set the password yourself after running this script
+API_KEY="changeMePlease" #Default api key, please change or pass in as argument
 IP_ADDRESS="" #public ip address or host, set here or pass as argument. if no value is set, the script will attempt to obtain it from a public provider (dynDNS)
 WALLET_SECRET="" #the secret passphrase for the wallet running the node, set here or pass as argument
 HEAT_ID="" #the account id of the wallet running the node, set here or pass in as argument
 MAX_PEERS=500 #number of peers node should connect to,set here or pass as argument, defaults to 500
 HALLMARK="" #the node hallmark, increases forging profits, set here or pass in as argument, if not set script will attempt to create a new hallmark for the node
 
-CURRENT_DATE=
+CURRENT_DATE=""
 
 
 #------------Functions---------------------------------------------------------
@@ -161,9 +144,10 @@ else
 		 
 fi
 #make sure home directory exists for user
-if test -f /tmp/testfile.log
-then
+if test -d /home/$HEAT_USER/;
+ then
     #directory exists
+    echo "home exists"
 else
    #directory does not exist
    sudo mkdir /home/$HEAT_USER
@@ -179,32 +163,52 @@ if [[ $IP_ADDRESS = *[!\ ]* ]]; then
 fi
 
 #Verify HEAT_ID (accountNumber in arguments)
-if [[ $HEAT_ID = *[!\]* ]]; then
+if [[ $HEAT_ID = *[!\ ]* ]]; then
 	#already set
 	echo $HEAT_ID
 else 
 	echo "HEAT_ID was not set in this script or passed in as an argument (accountNumber). HEAT_ID is required. Exiting script."
-	exit(1)
+	exit 1
 fi
 
 ##Verify and encode WALLET_SECRET
-if [[ $WALLET_SECRET = *[!\]* ]]; then
+if [[ $WALLET_SECRET = *[!\ ]* ]]; then
 	#already set
 	#URI encode it
 	WALLET_SECRET= encodeURIComponent $WALLET_SECRET
 else 
 	echo "WALLET_SECRET was not set in this script or passed in as an argument. WALLET_SECRET IS REQUIRED. Exiting script."
-	exit(1)
+	exit 1
 fi
 
 ##GET HALLMARK HERE
-if [[ $HALLMARK = *[!\]* ]]; then
+if [[ $HALLMARK = *[!\ ]* ]]; then
 	#already set
 	echo $HALLMARK
 else 
-	CURRENT_DATE= date +"%Y-%m-%d"
+	#CURRENT_DATE= date +"%Y-%m-%d" #heatwallet.com returns an error when using current date
+	#use default date instead
+	CURRENT_DATE="2016-01-01"
 	HALLMARK= curl -X GET --header 'Accept: application/json' 'https://heatwallet.com:7734/api/v1/tools/hallmark/encode/$IP_ADDRESS/200/$CURRENT_DATE/$WALLET_SECRET'
 fi
+
+//setup files
+INSTALL_DIR="/home/$HEAT_USER"
+BASE_DIR="$INSTALL_DIR/HeatLedger"
+VER_DIR="$BASE_DIR/$RELEASE"
+CONF_DIR="$VER_DIR/conf"
+BIN_DIR="$VER_DIR/bin"
+
+CONF="$CONF_DIR/heat.properties"
+BIN="$BIN_DIR/heatledger"
+SVC="$BASE_DIR/heatLedger.service"
+SYS_SVC="/etc/systemd/system/heatLedger.service"
+STRT="$BASE_DIR/startHeatLedger.sh"
+STRT_MINING="$BASE_DIR/startMining.sh"
+DELY_MINING="$BASE_DIR/delayMining.sh"
+MINING_INFO="$BASE_DIR/miningInfo.sh"
+HELP="$BASE_DIR/help.sh"
+
 
 #update repos and packages and install dependencies
 sudo apt-get update &&
