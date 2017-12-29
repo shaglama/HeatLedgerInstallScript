@@ -3,7 +3,7 @@ v 0.1.1
 Randy Hoggard
 December 29, 2017
 
-This script will install the latest Heat Ledger node software on an ubuntu machine.It has been minimally tested on Ubuntu 16.04. It is still in the early stages at this moment and any feedback on compatibility with other version of ubuntu or any problems encountered or any features you think are missing are greatly appreciated. If you'd like to contribute to this project, please feel welcome. 
+This script will install the latest Heat Ledger node software on an ubuntu machine, get a hallmark for the node, and start forging. It has been minimally tested on Ubuntu 16.04. It is still in the early stages at this moment and any feedback on compatibility with other version of ubuntu or any problems encountered or any features you think are missing are greatly appreciated. If you'd like to contribute to this project, please feel welcome. 
 
 Getting started:
 
@@ -15,7 +15,7 @@ Set execute permission for script:
 
 Execute script with required arguments (requires sudo priveleges)
 
-  ./installNode.sh -accountNumber="accountNumberHere" -walletSecret="wallet secret goes here"
+  ./installNode.sh --accountNumber="accountNumberHere" --walletSecret="wallet secret goes here"
   
  accountNumber is the numberic account number for your heat wallet that will be used to run the node
  walletSecret is the wallet secret for the heat wallet used to run the node
@@ -23,7 +23,7 @@ Execute script with required arguments (requires sudo priveleges)
  Example:
     ./installNode.sh -accountNumber="18204334369979641558" -walletSecret="THIS IS NOT A REAL WALLET SECRET"
  
- The script will download the latest software, setup your config file, create a service to launch and monitor the node, and start the node in a screen session so it is easy to view from anywhere and you don't have to leave a terminal running. The script will also create several helper scripts in the same folder. The most important one to know about is uninstall.sh. This script will remove all changes made by the install script.
+ The script will download the latest software, setup your config file, create a service to launch and monitor the node, and start the node in a screen session so it is easy to view from anywhere and you don't have to leave a terminal running.It will also issue the command to the node to start forging after the node is up. The script will also create several helper scripts in the same folder. The most important one to know about is uninstall.sh. This script will remove all changes made by the install script.
  usage
  
  ./uninstall.sh
