@@ -34,9 +34,13 @@ Execute script with required arguments (requires sudo priveleges)
  Donations welcome and greatly appreciated:
  
  Heat: shaglama@heatwallet.com 18204334369979641558
+ 
  Bitcoin: 15D9TLNu6FFoLiTJGbdMBpT6TETMsPc2xT
+ 
  Litecoin: LfXgenZQC81sQ1kc3G5JwGCdBb8DLVY6LU
+ 
  Monero: 4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRzRNy6LdJDpKnSvgsb
+ 
  Dash: XbpAUN6vqPb4yrfNMCJzkdQfDTGtB4qUNA
  
  
