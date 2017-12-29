@@ -4,8 +4,10 @@
 #2017
  
 #----------Vars----------------------------------------------------------------
-RELEASE="heatledger-2.3.2"
-RELEASE_URL="https://github.com/Heat-Ledger-Ltd/heatledger/releases/download/v2.3.2/heatledger-2.3.2.zip"
+RELEASE_NUM="2.4.0"
+RELEASE="heatledger-$RELEASE_NUM"
+RELEASE_FILE="$RELEASE.zip"
+RELEASE_URL="https://github.com/Heat-Ledger-Ltd/heatledger/releases/download/v$RELEASE_NUM/$RELEASE_FILE"
 
 HEAT_USER=$USER #user to run the node with, defaults to user that runs the script. to set a different user change here or pass in as argument, if user does not exist it will be created
 PASSWORD= #password for creating a new user, if new user is created without changing the password here or passing in as argument you will need to set the password yourself after running this script
@@ -157,16 +159,16 @@ fi
 #make sure node ip is set, if not try to determine what it is
 if [[ $IP_ADDRESS = *[!\ ]* ]]; then
  		 #already set
- 		 echo $IP_ADDRESS
+ 		 echo "$IP_ADDRESS"
  else
-		 IP_ADDRESS= `curl -s checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -e 's/<.*$//'`
+		 IP_ADDRESS=`curl -s checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -e 's/<.*$//'` &&
 		 echo "IP ADDRESS: $IP_ADDRESS"
 fi
 
 #Verify HEAT_ID (accountNumber in arguments)
 if [[ $HEAT_ID = *[!\ ]* ]]; then
 	#already set
-	echo $HEAT_ID
+	echo "$HEAT_ID"
 else 
 	echo "HEAT_ID was not set in this script or passed in as an argument (accountNumber). HEAT_ID is required. Exiting script."
 	exit 1
@@ -176,7 +178,8 @@ fi
 if [[ $WALLET_SECRET = *[!\ ]* ]]; then
 	#already set
 	#URI encode it
-	WALLET_SECRET= encodeURIComponent $WALLET_SECRET
+	ENCODED=$(encodeURIComponent "$WALLET_SECRET") &&
+	WALLET_SECRET="$ENCODED"
 else 
 	echo "WALLET_SECRET was not set in this script or passed in as an argument. WALLET_SECRET IS REQUIRED. Exiting script."
 	exit 1
@@ -185,13 +188,15 @@ fi
 ##GET HALLMARK HERE
 if [[ $HALLMARK = *[!\ ]* ]]; then
 	#already set
-	echo $HALLMARK
+	echo "$HALLMARK"
 else 
-	CURRENT_DATE=$(date +'%Y-%m-%d') #heatwallet.com returns an error when using current date
-	echo "--$CURRENT_DATE--"
-	#use default date instead
-	HALLMARK= curl -X GET --header 'Accept: application/json' 'https://heatwallet.com:7734/api/v1/tools/hallmark/encode/$IP_ADDRESS/200/2016-01-01/$WALLET_SECRET'
-	
+	CURRENT_DATE=$(date +'%Y-%m-%d') &&
+	HALLMARK_URL="https://heatwallet.com:7734/api/v1/tools/hallmark/encode/$IP_ADDRESS/200/$CURRENT_DATE/$WALLET_SECRET"
+	echo "hallmark url: $HALLMARK_URL"
+	HALLMARK_RESPONSE=`curl -X GET --header 'Accept: application/json' $HALLMARK_URL` &&
+	echo "hallmark response: $HALLMARK_RESPONSE"
+	HALLMARK=`echo "$HALLMARK_RESPONSE" | cut -c14- | rev | cut -c3- | rev` &&
+	echo "HALLMARK: $HALLMARK"	
 fi
 
 #setup files
@@ -214,31 +219,31 @@ UNINSTALL="$BASE_DIR/uninstall.sh"
 
 
 #update repos and packages and install dependencies
-#sudo apt-get update &&
-#sudo apt-get install -y default-jdk &&
-#sudo apt-get install -y unzip &&
-#sudo apt-get install -y screen &&
-#sudo apt-get install -y curl &&
+sudo apt-get update &&
+sudo apt-get install -y default-jdk &&
+sudo apt-get install -y unzip &&
+sudo apt-get install -y screen &&
+sudo apt-get install -y curl &&
 
 #download and extract heatLedger
 
 mkdir $BASE_DIR
 cd $BASE_DIR
-#wget $RELEASE_URL &&
-#unzip $RELEASE.zip &&
-cd "$VER_DIR" &&
+wget $RELEASE_URL &&
+unzip $RELEASE_FILE &&
+cd "$VER_DIR" 
 
 #create config file
-touch $CONF &&
-echo "heat.apiKey=$API_KEY" >> $CONF &&
-echo "heat.myAddress=$IP_ADDRESS" >> $CONF &&
-echo "heat.myPlatform=$HEAT_ID" >> $CONF &&
-echo "heat.maxNumberOfConnectedPublicPeers=$MAX_PEERS" >> $CONF &&
-echo "heat.myHallmark=$HALLMARK" >> $CONF &&
-echo "#heat.startForging=$WALLET_SECRET" >> $CONF &&
+touch $CONF 
+echo "heat.apiKey=$API_KEY" >> $CONF 
+echo "heat.myAddress=$IP_ADDRESS" >> $CONF
+echo "heat.myPlatform=$HEAT_ID" >> $CONF
+echo "heat.maxNumberOfConnectedPublicPeers=$MAX_PEERS" >> $CONF
+echo "heat.myHallmark=$HALLMARK" >> $CONF
+echo "#heat.startForging=$WALLET_SECRET" >> $CONF
 
-echo "Configuration written: " &&
-cat $CONF &&
+echo "Configuration written: " 
+cat $CONF
 
 #create start script
 touch $STRT
@@ -302,21 +307,24 @@ echo "WantedBy=multi-user.target" >> $SVC
 
 #create uninstall script
 touch $UNINSTALL
+echo "#!/bin/bash" >> $UNINSTALL
 echo "sudo systemctl stop heatLedger.service" >> $UNINSTALL
 echo "sudo systemctl disable heatLedger.service" >> $UNINSTALL
 echo "sudo rm /etc/systemd/system/heatLedger.service" >> $UNINSTALL
 echo "sudo rm -r $BASE_DIR" >> $UNINSTALL
+sudo chmod +x $UNINSTALL
 
 #load service
-sudo cp $SVC $SYS_SVC
-#sudo systemctl daemon-reload
-#sudo systemctl enable heatLedger.service
-#sudo systemctl start heatLedger.service
+sudo cp $SVC $SYS_SVC &&
+sudo systemctl daemon-reload &&
+sudo systemctl enable heatLedger.service &&
+sudo systemctl daemon-reload &&
+sudo systemctl start heatLedger.service
 
 
 
 
- 
+
 
 
 
