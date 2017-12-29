@@ -318,8 +318,8 @@ sudo chmod +x $UNINSTALL
 sudo cp $SVC $SYS_SVC &&
 sudo systemctl daemon-reload &&
 sudo systemctl enable heatLedger.service &&
-sudo systemctl daemon-reload &&
 sudo systemctl start heatLedger.service
+/bin/bash $STRT
 
 
 
