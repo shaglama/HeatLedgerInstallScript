@@ -159,7 +159,8 @@ if [[ $IP_ADDRESS = *[!\ ]* ]]; then
  		 #already set
  		 echo $IP_ADDRESS
  else
-		 IP_ADDRESS= curl -s checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -e 's/<.*$//'
+		 IP_ADDRESS= `curl -s checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -e 's/<.*$//'`
+		 echo "IP ADDRESS: $IP_ADDRESS"
 fi
 
 #Verify HEAT_ID (accountNumber in arguments)
@@ -186,13 +187,14 @@ if [[ $HALLMARK = *[!\ ]* ]]; then
 	#already set
 	echo $HALLMARK
 else 
-	#CURRENT_DATE= date +"%Y-%m-%d" #heatwallet.com returns an error when using current date
+	CURRENT_DATE=$(date +'%Y-%m-%d') #heatwallet.com returns an error when using current date
+	echo "--$CURRENT_DATE--"
 	#use default date instead
-	CURRENT_DATE="2016-01-01"
-	HALLMARK= curl -X GET --header 'Accept: application/json' 'https://heatwallet.com:7734/api/v1/tools/hallmark/encode/$IP_ADDRESS/200/$CURRENT_DATE/$WALLET_SECRET'
+	HALLMARK= curl -X GET --header 'Accept: application/json' 'https://heatwallet.com:7734/api/v1/tools/hallmark/encode/$IP_ADDRESS/200/2016-01-01/$WALLET_SECRET'
+	
 fi
 
-//setup files
+#setup files
 INSTALL_DIR="/home/$HEAT_USER"
 BASE_DIR="$INSTALL_DIR/HeatLedger"
 VER_DIR="$BASE_DIR/$RELEASE"
@@ -208,21 +210,22 @@ STRT_MINING="$BASE_DIR/startMining.sh"
 DELY_MINING="$BASE_DIR/delayMining.sh"
 MINING_INFO="$BASE_DIR/miningInfo.sh"
 HELP="$BASE_DIR/help.sh"
+UNINSTALL="$BASE_DIR/uninstall.sh"
 
 
 #update repos and packages and install dependencies
-sudo apt-get update &&
-sudo apt-get install -y default-jdk &&
-sudo apt-get install -y unzip &&
-sudo apt-get install -y screen &&
-sudo apt-get install -y curl &&
+#sudo apt-get update &&
+#sudo apt-get install -y default-jdk &&
+#sudo apt-get install -y unzip &&
+#sudo apt-get install -y screen &&
+#sudo apt-get install -y curl &&
 
 #download and extract heatLedger
 
 mkdir $BASE_DIR
 cd $BASE_DIR
-wget $RELEASE_URL &&
-unzip $RELEASE.zip &&
+#wget $RELEASE_URL &&
+#unzip $RELEASE.zip &&
 cd "$VER_DIR" &&
 
 #create config file
@@ -297,11 +300,18 @@ echo "KillMode=process" >> $SVC
 echo "[Install]" >> $SVC
 echo "WantedBy=multi-user.target" >> $SVC
 
+#create uninstall script
+touch $UNINSTALL
+echo "sudo systemctl stop heatLedger.service" >> $UNINSTALL
+echo "sudo systemctl disable heatLedger.service" >> $UNINSTALL
+echo "sudo rm /etc/systemd/system/heatLedger.service" >> $UNINSTALL
+echo "sudo rm -r $BASE_DIR" >> $UNINSTALL
+
 #load service
 sudo cp $SVC $SYS_SVC
-sudo systemctl daemon-reload
-sudo systemctl enable heatLedger.service
-sudo systemctl start heatLedger.service
+#sudo systemctl daemon-reload
+#sudo systemctl enable heatLedger.service
+#sudo systemctl start heatLedger.service
 
 
 
