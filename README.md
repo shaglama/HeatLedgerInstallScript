@@ -16,12 +16,20 @@ Set execute permission for script:
 Execute script with required arguments (requires sudo priveleges)
 
   ./installNode.sh --accountNumber="accountNumberHere" --walletSecret="wallet secret goes here"
+  ./installNode.sh --accountNumber="accountNumberHere" --walletSecret="wallet secret goes here" --key="apiKeyForNodeHere" --user=UserToRunNode --password="passwordOfUserToRunNode"
   
- accountNumber is the numberic account number for your heat wallet that will be used to run the node
- walletSecret is the wallet secret for the heat wallet used to run the node
+ accountNumber is the numberic account number for your heat wallet that will be used to run the node --REQUIRED
+ 
+ walletSecret is the wallet secret for the heat wallet used to run the node --REQUIRED
+ 
+ key is the api key for accessing functions on the node, a default is used but if you wish you can specify here --OPTIONAL
+ 
+ user is the user under who the miner will be run. If you do not specify a user, it will default to the user running the script. If you do specify a user, and that user does not exist, the script will create the user. 
+ 
+ passowrd is the password to use for creating a new user. If a new user is created an no password is specified, the user will not be assigned a password and you will have to do it manually. This is not needed if the user already exists. 
  
  Example:
-    ./installNode.sh -accountNumber="18204334369979641558" -walletSecret="THIS IS NOT A REAL WALLET SECRET"
+    ./installNode.sh --accountNumber="18204334369979641558" --walletSecret="THIS IS NOT A REAL WALLET SECRET"
  
  The script will download the latest software, setup your config file, create a service to launch and monitor the node, and start the node in a screen session so it is easy to view from anywhere and you don't have to leave a terminal running.It will also issue the command to the node to start forging after the node is up. The script will also create several helper scripts in the same folder. The most important one to know about is uninstall.sh. This script will remove all changes made by the install script.
  usage
