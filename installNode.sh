@@ -255,7 +255,7 @@ echo "echo 'to attach to node : in terminal type  	screen -s heatLedger'" >> $ST
 echo "echo 'to detach from node while attached : hold control and press a. press d'" >> $STRT
 echo "echo 'to kill node while attached: hold control and press a. press k. press y.'" >> $STRT
 echo "screen -dmS heatLedger /bin/bash $BIN &" >> $STRT
-echo "screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/W//g' > 'home/$HEAT_USER/HeatLedger/startHeatLedger.pid'">> $STRT
+echo "screen -list | grep 'heatLedger' |cut -f1 -d'.' | sed 's/\W//g' > 'home/$HEAT_USER/HeatLedger/startHeatLedger.pid'">> $STRT
 sudo chmod +x $STRT
 
 #create mining start script
@@ -302,7 +302,7 @@ echo "Type=forking" >> $SVC
 echo "PIDFile='/home/$HEAT_USER/HeatLedger/startHeadLedger.pid'" >> $SVC
 echo "User=$HEAT_USER" >> $SVC
 echo "WorkingDirectory=/home/$HEAT_USER/HeatLedger" >> $SVC
-echo "ExecStart=/bin/bash startHeatLedger.sh" >> $SVC
+echo "ExecStart=/bin/bash /home/$HEAT_USER/HeatLedger/startHeatLedger.sh" >> $SVC
 echo "ExecStartPost=/bin/bash -c '/home/$HEAT_USER/HeatLedger/delayMining.sh &'" >> $SVC
 echo "Restart=always" >> $SVC
 echo "KillMode=process" >> $SVC
@@ -323,7 +323,7 @@ sudo cp $SVC $SYS_SVC &&
 sudo systemctl daemon-reload &&
 sudo systemctl enable heatLedger.service &&
 sudo systemctl start heatLedger.service
-#/bin/bash $STRT
+
 
 
 
