@@ -302,7 +302,7 @@ echo "[Service]" >> $SVC
 echo "Type=forking" >> $SVC
 echo "PIDFile='/home/$HEAT_USER/HeatLedger/startHeadLedger.pid'" >> $SVC
 echo "User=$HEAT_USER" >> $SVC
-echo "WorkingDirectory=/home/$HEAT_USER/HeatLedger" >> $SVC
+echo "WorkingDirectory=$BIN_DIR" >> $SVC
 echo "ExecStart=/bin/bash /home/$HEAT_USER/HeatLedger/startHeatLedger.sh" >> $SVC
 echo "ExecStartPost=/bin/bash -c '/home/$HEAT_USER/HeatLedger/delayMining.sh &'" >> $SVC
 echo "Restart=always" >> $SVC
