@@ -208,7 +208,7 @@ fi
 ##Verify FORCE_SCAN
 #Convert to lower case
 FS_LC= echo $FORCE_SCAN | sed 's/.*/\U&/'
-if [[ "$FS_LC" = "true" ]] || [[ "$FS_LC" = "false"]] then
+if [[ "$FS_LC" = "true" ]] || [[ "$FS_LC" = "false"]] ; then
 	FORCE_SCAN="$FS_LC"
 	echo "Force Scan = $FORCE_SCAN"
 else
@@ -219,7 +219,7 @@ fi
 ##Verify FORCE_VALIDATE
 #Convert to lower case
 FV_LC = echo $FORCE_VALIDATE | sed 's/.*/\U&/'
-if [[ "$FV_LC" = "true" ]] || [[ "$FV_LC" = "false"]] then
+if [[ "$FV_LC" = "true" ]] || [[ "$FV_LC" = "false"]] ; then
 	FORCE_VALIDATE="$FV_LC"
 	echo "Force validate = $FORCE_VALIDATE"
 else
