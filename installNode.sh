@@ -240,6 +240,8 @@ echo "heat.myAddress=$IP_ADDRESS" >> $CONF
 echo "heat.myPlatform=$HEAT_ID" >> $CONF
 echo "heat.maxNumberOfConnectedPublicPeers=$MAX_PEERS" >> $CONF
 echo "heat.myHallmark=$HALLMARK" >> $CONF
+echo "heat.forceScan=true" >> $CONF
+echo "heat.forceValidate=true" >> $CONF
 echo "#heat.startForging=$WALLET_SECRET" >> $CONF
 
 echo "Configuration written: " 
@@ -248,14 +250,12 @@ cat $CONF
 #create start script
 touch $STRT
 echo "#!/bin/bash" >> $STRT
-echo "cd $BIN_DIR" >> $STRT
 echo "echo 'Starting node'" >>$STRT
 echo "echo 'to attach to node : in terminal type  	screen -s heatLedger'" >> $STRT
 echo "echo 'to detach from node while attached : hold control and press a. press d'" >> $STRT
 echo "echo 'to kill node while attached: hold control and press a. press k. press y.'" >> $STRT
-echo "screen -dmS heatLedger ./heatledger" >> $STRT
-echo "cd $BASE_DIR" >> $STRT
-echo "nohup ./delayMining.sh &" >> $STRT
+echo "screen -dmS heatLedger /bin/bash $BIN &" >> $STRT
+echo "screen -list | grep 'heatLedger' |cut -f1 -d'.' | sed 's/W//g' > 'home/$HEAT_USER/HeatLedger/startHeatLedger.pid'">> $STRT
 sudo chmod +x $STRT
 
 #create mining start script
@@ -295,11 +295,15 @@ sudo chmod +x $HELP
 touch $SVC
 echo "[Unit]" >> $SVC
 echo "Description=Start HeatLedger Node" >> $SVC
+echo "Wants=network.target" >> $SVC
+echo "After=network.target" >> $SVC
 echo "[Service]" >> $SVC
+echo "Type=forking" >> $SVC
+echo "PIDFile='/home/$HEAT_USER/HeatLedger/startHeadLedger.pid'" >> $SVC
 echo "User=$HEAT_USER" >> $SVC
 echo "WorkingDirectory=/home/$HEAT_USER/HeatLedger" >> $SVC
-echo "Type=forking" >> $SVC
 echo "ExecStart=/bin/bash startHeatLedger.sh" >> $SVC
+echo "ExecStartPost=/bin/bash -c '/home/$HEAT_USER/HeatLedger/delayMining.sh &'" >> $SVC
 echo "Restart=always" >> $SVC
 echo "KillMode=process" >> $SVC
 echo "[Install]" >> $SVC
