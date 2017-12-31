@@ -13,21 +13,33 @@ Download installNode.sh from:
 Set execute permission for script:
   chmod +x installNode.sh
 
-Execute script with required arguments (requires sudo priveleges)
+Execute script with required arguments (requires sudo priveleges) examples
 
   ./installNode.sh --accountNumber="accountNumberHere" --walletSecret="wallet secret goes here"
-  ./installNode.sh --accountNumber="accountNumberHere" --walletSecret="wallet secret goes here" --key="apiKeyForNodeHere" --user=UserToRunNode --password="passwordOfUserToRunNode"
   
- accountNumber is the numberic account number for your heat wallet that will be used to run the node --REQUIRED
+  ./installNode.sh --accountNumber="accountNumberHere" --walletSecret="wallet secret goes here" --key="apiKeyForNodeHere" --user="UserToRunNode" --password="passwordOfUserToRunNode" --hallmark="hallmarkHere" --ipAddress="ipHere" --maxPeers="500" --forceScan="true" --forceValidate="true"
+ ############################################################################################################################ 
+ --accountNumber is the numberic account number for your heat wallet that will be used to run the node --REQUIRED
  
- walletSecret is the wallet secret for the heat wallet used to run the node --REQUIRED
+ --walletSecret is the wallet secret for the heat wallet used to run the node --REQUIRED
  
- key is the api key for accessing functions on the node, a default is used but if you wish you can specify here --OPTIONAL
+ --key is the api key for accessing functions on the node, a default is used but if you wish you can specify here --OPTIONAL
  
- user is the user under who the miner will be run. If you do not specify a user, it will default to the user running the script. If you do specify a user, and that user does not exist, the script will create the user. 
+ --user is the user under who the miner will be run. If you do not specify a user, it will default to the user running the script. If you do specify a user, and that user does not exist, the script will create the user. 
  
- passowrd is the password to use for creating a new user. If a new user is created an no password is specified, the user will not be assigned a password and you will have to do it manually. This is not needed if the user already exists. 
+ --passowrd is the password to use for creating a new user. If a new user is created an no password is specified, the user will not be assigned a password and you will have to do it manually. This is not needed if the user already exists. 
  
+ --hallmark is the hallmark for the node. If not provided, one will be created --OPTIONAL
+ 
+ --ipAddress is the public ip address of the node. If not provided, the script will attempt to obatain it automatically --OPTIONAL
+ 
+ --maxPeers is the max number of peers the node should connect to. If not provided, defaults to 500. --OPTIONAL
+ 
+ --forceScan if set to true will configure the node to rescan the blockchain, defaults to false  --OPTIONAL
+ 
+ --forceValidate if set to true will configure the node to revalidate the transactions on the chain, defaults to false  --OPTIONAL
+ 
+ ##############################################################################################################################
  Example:
     ./installNode.sh --accountNumber="18204334369979641558" --walletSecret="THIS IS NOT A REAL WALLET SECRET"
  
