@@ -19,7 +19,7 @@ HEAT_ID="" #the account id of the wallet running the node, set here or pass in a
 MAX_PEERS=500 #number of peers node should connect to,set here or pass as argument, defaults to 500
 HALLMARK="" #the node hallmark, increases forging profits, set here or pass in as argument, if not set script will attempt to create a new hallmark for the node
 FORCE_RESCAN="false" #if set to true node will be configured to rescan blockchain
-FORCE_VALIDATE="false"#if set to true node will be configured to revalidate transactions on the blockchain
+FORCE_VALIDATE="false" #if set to true node will be configured to revalidate transactions on the blockchain
 CURRENT_DATE=""
 
 
