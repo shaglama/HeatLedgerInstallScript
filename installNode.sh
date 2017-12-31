@@ -323,7 +323,7 @@ sudo cp $SVC $SYS_SVC &&
 sudo systemctl daemon-reload &&
 sudo systemctl enable heatLedger.service &&
 sudo systemctl start heatLedger.service
-/bin/bash $STRT
+#/bin/bash $STRT
 
 
 
