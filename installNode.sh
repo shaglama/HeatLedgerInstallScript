@@ -18,8 +18,9 @@ WALLET_SECRET="" #the secret passphrase for the wallet running the node, set her
 HEAT_ID="" #the account id of the wallet running the node, set here or pass in as argument
 MAX_PEERS=500 #number of peers node should connect to,set here or pass as argument, defaults to 500
 HALLMARK="" #the node hallmark, increases forging profits, set here or pass in as argument, if not set script will attempt to create a new hallmark for the node
-
-CURRENT_DATE=""
+FORCE_SCAN="false" #if set to true node will be configured to rescan blockchain
+FORCE_VALIDATE="false" #if set to true node will be configured to revalidate transactions on the blockchain
+CURRENT_DATE="" #No need to set this, its automatically obtained
 
 
 #------------Functions---------------------------------------------------------
@@ -84,6 +85,16 @@ while [[ $# -gt 0 ]]; do
 			shift
 			HALLMARK="$1"
 			;;
+			
+			-fr|--forceScan)
+			shift
+			FORCE_SCAN="$1"
+			;;
+			
+			-fv|--forceValidate)
+			shift
+			FORCE_VALIDATE="$1"
+			;;
 			      
         # This is an arg=value type option. Will catch -u=userName or --user=userName
         -u=*|--user=*)
@@ -119,6 +130,14 @@ while [[ $# -gt 0 ]]; do
 			
 			-h=*|--hallmark=*)
 			HALLMARK="${key#*=}"
+			;;
+			
+			-fs=*|--forceScan=*)
+			FORCE_SCAN="${key#*=}"
+			;;
+			
+			-fv=*|--forceValidate=*)
+			FORCE_VALIDATE="${key#*=}"
 			;;        
         
         *)
@@ -186,6 +205,28 @@ else
 	exit 1
 fi
 
+##Verify FORCE_SCAN
+#Convert to lower case
+FS_LC=`echo "$FORCE_SCAN" | sed 's/.*/\L&/'`
+if [[ "$FS_LC" == "true" || "$FS_LC" == "false" ]]; then
+	FORCE_SCAN="$FS_LC"
+	echo "Force Scan = $FORCE_SCAN"
+else
+	echo "$FORCE_SCAN is invalid value for force scan. Valid values are true and false"
+	exit 1	
+fi
+
+##Verify FORCE_VALIDATE
+#Convert to lower case
+FV_LC=`echo $FORCE_VALIDATE | sed 's/.*/\L&/'`
+if [[ "$FV_LC" == "true" || "$FV_LC" == "false" ]]; then
+	FORCE_VALIDATE="$FV_LC"
+	echo "Force validate = $FORCE_VALIDATE"
+else
+	echo "$FORCE_VALIDATE is invalid value for force validate. Valid values are true and false"
+	exit 1		
+fi
+
 ##GET HALLMARK HERE
 if [[ $HALLMARK = *[!\ ]* ]]; then
 	#already set
@@ -241,8 +282,8 @@ echo "heat.myAddress=$IP_ADDRESS" >> $CONF
 echo "heat.myPlatform=$HEAT_ID" >> $CONF
 echo "heat.maxNumberOfConnectedPublicPeers=$MAX_PEERS" >> $CONF
 echo "heat.myHallmark=$HALLMARK" >> $CONF
-echo "heat.forceScan=true" >> $CONF
-echo "heat.forceValidate=true" >> $CONF
+echo "heat.forceScan=$FORCE_SCAN" >> $CONF
+echo "heat.forceValidate=$FORCE_VALIDATE" >> $CONF
 echo "#heat.startForging=$WALLET_SECRET" >> $CONF
 
 echo "Configuration written: " 
