@@ -212,7 +212,7 @@ if [[ "$FS_LC" == "true" || "$FS_LC" == "false" ]]; then
 	FORCE_SCAN="$FS_LC"
 	echo "Force Scan = $FORCE_SCAN"
 else
-	echo "Invalid value for force scan. Valid values are true and false"
+	echo "$FORCE_SCAN is invalid value for force scan. Valid values are true and false"
 	exit 1	
 fi
 
@@ -223,7 +223,7 @@ if [[ "$FV_LC" == "true" || "$FV_LC" == "false" ]]; then
 	FORCE_VALIDATE="$FV_LC"
 	echo "Force validate = $FORCE_VALIDATE"
 else
-	echo "Invalid value for force validate. Valid values are true and false"
+	echo "$FORCE_VALIDATE is invalid value for force validate. Valid values are true and false"
 	exit 1		
 fi
 
