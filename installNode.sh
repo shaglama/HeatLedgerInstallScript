@@ -317,6 +317,13 @@ echo "sudo systemctl stop heatLedger.service" >> $UNINSTALL
 echo "sudo systemctl disable heatLedger.service" >> $UNINSTALL
 echo "sudo rm /etc/systemd/system/heatLedger.service" >> $UNINSTALL
 echo "sudo rm -r $BASE_DIR" >> $UNINSTALL
+echo "screen -ls '$SESSION_NAME' | (" >> $UNINSTALL
+echo "IFS=$(printf '\t');" >> $UNINSTALL
+echo "sed 's/^$IFS//' |" >> $UNINSTALL
+echo "while read -r name stuff; do" >> $UNINSTALL
+echo "screen -S '$name' -X quit" >> $UNINSTALL
+echo "done" >> $UNINSTALL
+echo ")" >> $UNINSTALL
 sudo chmod +x $UNINSTALL
 
 #load service
