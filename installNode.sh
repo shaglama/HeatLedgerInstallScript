@@ -20,7 +20,7 @@ MAX_PEERS=500 #number of peers node should connect to,set here or pass as argume
 HALLMARK="" #the node hallmark, increases forging profits, set here or pass in as argument, if not set script will attempt to create a new hallmark for the node
 FORCE_SCAN="false" #if set to true node will be configured to rescan blockchain
 FORCE_VALIDATE="false" #if set to true node will be configured to revalidate transactions on the blockchain
-CURRENT_DATE=""
+CURRENT_DATE="" #No need to set this, its automatically obtained
 
 
 #------------Functions---------------------------------------------------------
@@ -207,24 +207,24 @@ fi
 
 ##Verify FORCE_SCAN
 #Convert to lower case
-FS_LC= echo $FORCE_SCAN | sed 's/.*/\U&/'
-if [[ "$FS_LC" = "true" ]] || [[ "$FS_LC" = "false"]] ; then
+FS_LC=`echo "$FORCE_SCAN" | sed 's/.*/\L&/'`
+if [[ "$FS_LC" == "true" || "$FS_LC" == "false" ]]; then
 	FORCE_SCAN="$FS_LC"
 	echo "Force Scan = $FORCE_SCAN"
 else
 	echo "Invalid value for force scan. Valid values are true and false"
-	exit(1)		
+	exit 1	
 fi
 
 ##Verify FORCE_VALIDATE
 #Convert to lower case
-FV_LC = echo $FORCE_VALIDATE | sed 's/.*/\U&/'
-if [[ "$FV_LC" = "true" ]] || [[ "$FV_LC" = "false"]] ; then
+FV_LC=`echo $FORCE_VALIDATE | sed 's/.*/\U&/'`
+if [[ "$FV_LC" == "true" || "$FV_LC" == "false" ]]; then
 	FORCE_VALIDATE="$FV_LC"
 	echo "Force validate = $FORCE_VALIDATE"
 else
 	echo "Invalid value for force validate. Valid values are true and false"
-	exit(1)		
+	exit 1		
 fi
 
 ##GET HALLMARK HERE
