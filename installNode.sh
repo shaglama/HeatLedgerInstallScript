@@ -314,10 +314,15 @@ echo "WantedBy=multi-user.target" >> $SVC
 #create uninstall script
 touch $UNINSTALL
 echo "#!/bin/bash" >> $UNINSTALL
+echo "echo 'stopping heatLedger service'" >> $UNINSTALL
 echo "sudo systemctl stop heatLedger.service" >> $UNINSTALL
+echo "echo 'disabling heatLedger service'" >> $UNINSTALL
 echo "sudo systemctl disable heatLedger.service" >> $UNINSTALL
+echo "echo 'removing service file from systemd directory'" >>$UNINSTALL
 echo "sudo rm /etc/systemd/system/heatLedger.service" >> $UNINSTALL
+echo "echo 'removing HeatLedger directory'" >> $UNINSTALL
 echo "sudo rm -r $BASE_DIR" >> $UNINSTALL
+echo "echo 'Clean up any orphan processes'" >> $UNINSTALL
 echo "screen -ls 'heatLedger' | grep 'heatLedger' | (" >> $UNINSTALL
 echo "IFS=\$(printf '\t');" >> $UNINSTALL
 echo "sed 's/^\$IFS//' |" >> $UNINSTALL
@@ -325,6 +330,7 @@ echo "while read -r name stuff; do" >> $UNINSTALL
 echo "screen -S '\$name' -X quit" >> $UNINSTALL
 echo "done" >> $UNINSTALL
 echo ")" >> $UNINSTALL
+echo "echo 'Finished uninstalling HeatLedger'" >> $UNINSTALL
 sudo chmod +x $UNINSTALL
 
 #load service
