@@ -218,7 +218,7 @@ fi
 
 ##Verify FORCE_VALIDATE
 #Convert to lower case
-FV_LC=`echo $FORCE_VALIDATE | sed 's/.*/\U&/'`
+FV_LC=`echo $FORCE_VALIDATE | sed 's/.*/\L&/'`
 if [[ "$FV_LC" == "true" || "$FV_LC" == "false" ]]; then
 	FORCE_VALIDATE="$FV_LC"
 	echo "Force validate = $FORCE_VALIDATE"
