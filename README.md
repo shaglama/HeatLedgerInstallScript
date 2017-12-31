@@ -18,7 +18,9 @@ Execute script with required arguments (requires sudo priveleges) examples
   ./installNode.sh --accountNumber="accountNumberHere" --walletSecret="wallet secret goes here"
   
   ./installNode.sh --accountNumber="accountNumberHere" --walletSecret="wallet secret goes here" --key="apiKeyForNodeHere" --user="UserToRunNode" --password="passwordOfUserToRunNode" --hallmark="hallmarkHere" --ipAddress="ipHere" --maxPeers="500" --forceScan="true" --forceValidate="true"
- ######################################################################################## 
+  
+ ########################################################################################
+ 
  --accountNumber is the numberic account number for your heat wallet that will be used to run the node --REQUIRED
  
  --walletSecret is the wallet secret for the heat wallet used to run the node --REQUIRED
@@ -40,6 +42,7 @@ Execute script with required arguments (requires sudo priveleges) examples
  --forceValidate if set to true will configure the node to revalidate the transactions on the chain, defaults to false  --OPTIONAL
  
  ########################################################################################
+ 
  Example:
     ./installNode.sh --accountNumber="18204334369979641558" --walletSecret="THIS IS NOT A REAL WALLET SECRET"
  
