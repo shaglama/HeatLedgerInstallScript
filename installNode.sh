@@ -255,7 +255,7 @@ echo "echo 'to attach to node : in terminal type  	screen -s heatLedger'" >> $ST
 echo "echo 'to detach from node while attached : hold control and press a. press d'" >> $STRT
 echo "echo 'to kill node while attached: hold control and press a. press k. press y.'" >> $STRT
 echo "screen -dmS heatLedger /bin/bash $BIN &" >> $STRT
-echo "screen -list | grep 'heatLedger' |cut -f1 -d'.' | sed 's/\W//g' > 'home/$HEAT_USER/HeatLedger/startHeatLedger.pid'">> $STRT
+echo "screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' > 'home/$HEAT_USER/HeatLedger/startHeatLedger.pid'">> $STRT
 sudo chmod +x $STRT
 
 #create mining start script
