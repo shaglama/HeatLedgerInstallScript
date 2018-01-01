@@ -5,6 +5,7 @@
 #2017
  
 #----------Vars----------------------------------------------------------------
+SCRIPT=`readlink -f $0`
 RELEASE_JSON=""=
 RELEASE_NUM="" #"2.4.0"
 RELEASE="" #"heatledger-$RELEASE_NUM"
@@ -221,8 +222,8 @@ fi
 if [[ $WALLET_SECRET = *[!\ ]* ]]; then
 	#already set
 	#URI encode it
-	ENCODED=$(encodeURIComponent "$WALLET_SECRET") &&
-	WALLET_SECRET="$ENCODED"
+	ENCODED=$(encodeURIComponent "$WALLET_SECRET")
+	#WALLET_SECRET="$ENCODED"
 else 
 	echo "WALLET_SECRET was not set in this script or passed in as an argument. WALLET_SECRET IS REQUIRED. Exiting script."
 	exit 1
@@ -256,7 +257,7 @@ if [[ $HALLMARK = *[!\ ]* ]]; then
 	echo "$HALLMARK"
 else 
 	CURRENT_DATE=$(date +'%Y-%m-%d') &&
-	HALLMARK_URL="https://heatwallet.com:7734/api/v1/tools/hallmark/encode/$IP_ADDRESS/200/$CURRENT_DATE/$WALLET_SECRET"
+	HALLMARK_URL="https://heatwallet.com:7734/api/v1/tools/hallmark/encode/$IP_ADDRESS/200/$CURRENT_DATE/$ENCODED"
 	echo "hallmark url: $HALLMARK_URL"
 	HALLMARK_RESPONSE=`curl -X GET --header 'Accept: application/json' $HALLMARK_URL` &&
 	echo "hallmark response: $HALLMARK_RESPONSE"
@@ -281,6 +282,7 @@ DELY_MINING="$BASE_DIR/delayMining.sh"
 MINING_INFO="$BASE_DIR/miningInfo.sh"
 HELP="$BASE_DIR/help.sh"
 UNINSTALL="$BASE_DIR/uninstall.sh"
+UPDATE="$BASE_DIR/update.sh"
 
 #download and extract heatLedger
 
@@ -299,7 +301,7 @@ echo "heat.maxNumberOfConnectedPublicPeers=$MAX_PEERS" >> $CONF
 echo "heat.myHallmark=$HALLMARK" >> $CONF
 echo "heat.forceScan=$FORCE_SCAN" >> $CONF
 echo "heat.forceValidate=$FORCE_VALIDATE" >> $CONF
-echo "#heat.startForging=$WALLET_SECRET" >> $CONF
+echo "#heat.startForging=$ENCODED" >> $CONF
 
 echo "Configuration written: " 
 cat $CONF
@@ -321,7 +323,7 @@ touch $STRT_MINING
 echo "#!/bin/bash" >> $STRT_MINING
 echo "Starting Forging" >> startMining.log
 echo date >> startMining.log
-echo "curl -k -s http://localhost:7733/api/v1/mining/start/$WALLET_SECRET\?api_key=$API_KEY >> startMining.log" >> $STRT_MINING
+echo "curl -k -s http://localhost:7733/api/v1/mining/start/$ENCODED\?api_key=$API_KEY >> startMining.log" >> $STRT_MINING
 sudo chmod +x $STRT_MINING
 
 #create mining delay script
@@ -336,7 +338,7 @@ touch $MINING_INFO
 echo "#!/bin/bash" >> $MINING_INFO
 echo "echo 'Mining Info' >> miningInfo.log" >> $MINING_INFO
 echo "date >> miningInfo.log" >> $MINING_INFO
-echo "curl -k -s http://localhost:7733/api/v1/mining/info/$WALLET_SECRET\?api_key=$API_KEY >> miningInfo.log" >> $MINING_INFO
+echo "curl -k -s http://localhost:7733/api/v1/mining/info/$ENCODED\?api_key=$API_KEY >> miningInfo.log" >> $MINING_INFO
 sudo chmod +x $MINING_INFO
 
 #create help script
@@ -389,7 +391,32 @@ echo ")" >> $UNINSTALL
 echo "echo 'Finished uninstalling HeatLedger'" >> $UNINSTALL
 sudo chmod +x $UNINSTALL
 
+#create get latest release info script
+
+#create update script
+touch $UPDATE
+echo "#!/bin/bash" >> $UPDATE
+echo "RELEASE_JSON=`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest`" >> $UPDATE
+FILESTRING="echo \$RELEASE_JSON | jq -r '.assets[0] | name'"
+echo "RELEASE_FILE=$FILESTRING" >> $UPDATE
+RELEASESTRING="echo '\$RELEASE_FILE' | rev | cut -c 5- | rev" >> $UPDATE
+echo "RELEASE=$RELEASESTRING" >> $UPDATE
+#echo "RELEASE=`echo '\$RELEASE_FILE' | rev | cut -c 5- | rev" >> $UPDATE
+OLD_DIR="$VER_DIR.old"
+echo "sudo systemctl stop heatLedger.service" >> $UPDATE
+echo "mv $VER_DIR /tmp/$OLD_DIR" >> $UPDATE 
+echo "cd $BASE_DIR" >> $UPDATE
+echo "mv $SCRIPT /temp/heatScript" >> $UPDATE
+echo "/bin/bash uninstall.sh" >> $UPDATE
+echo "mv /temp/heatScript $BASE_DIR/installNode.sh" >> $UPDATE
+echo "bash installNode.sh --accountNumber=$HEAT_ID --user=$HEAT_USER --key=$API_KEY --password=$PASSWORD --ipAddress=$IP_ADDRESS --walletSecret=$WALLET_SECRET --maxPeers=$MAX_PEERS --hallmark=$HAlLMARK --forceScan=true --forceValidate=true" >> $UPDATE 
+echo "sudo systemctl stop heatLedger" >> $UPDATE
+echo "mv /temp/$OLD_DIR/bin/blockchain $BASE_DIR/$RELEASE/bin/blockchain" >> $UPDATE
+echo "sudo systemctl start heatLedger" >> $UPDATE
+sudo chmod +x $UPDATE
+
 #load service
+cp $SCRIPT $BASE_DIR/installNode.sh
 sudo cp $SVC $SYS_SVC &&
 sudo systemctl daemon-reload &&
 sudo systemctl enable heatLedger.service &&
