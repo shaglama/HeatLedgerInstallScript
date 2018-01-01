@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.4.5
+#Version 0.1.4.6
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #2017
@@ -402,16 +402,16 @@ echo "RELEASE_FILE=$FILESTRING" >> $UPDATE
 RELEASESTRING="\`echo \"\$RELEASE_FILE\" | rev | cut -c 5- | rev\`" >> $UPDATE
 echo "RELEASE=$RELEASESTRING" >> $UPDATE
 #echo "RELEASE=`echo '\$RELEASE_FILE' | rev | cut -c 5- | rev" >> $UPDATE
-OLD_DIR="/tmp/oldHeat"
-echo "sudo systemctl stop heatLedger.service" >> $UPDATE
-echo "mv $VER_DIR $OLD_DIR" >> $UPDATE 
+OLD_CHAIN="/tmp/oldChain"
+#echo "sudo systemctl stop heatLedger.service" >> $UPDATE
+echo "cp $BIN_DIR/blockchain $OLD_CHAIN" >> $UPDATE 
 #echo "cd $BASE_DIR" >> $UPDATE
 echo "mv $SCRIPT /tmp/heatScript" >> $UPDATE
 echo "/bin/bash $BASE_DIR/uninstall.sh" >> $UPDATE
 echo "mv /tmp/heatScript $INSTALL_DIR/installNode.sh" >> $UPDATE
 echo "/bin/bash $INSTALL_DIR/installNode.sh --accountNumber='$HEAT_ID' --user='$HEAT_USER' --key='$API_KEY' --password='$PASSWORD' --ipAddress='$IP_ADDRESS' --walletSecret='$WALLET_SECRET' --maxPeers='$MAX_PEERS' --hallmark='$HAlLMARK' --forceScan='true' --forceValidate='true'" >> $UPDATE 
 echo "sudo systemctl stop heatLedger" >> $UPDATE
-echo "mv $OLD_DIR/bin/blockchain $BASE_DIR/$RELEASE/bin/blockchain" >> $UPDATE
+echo "mv $OLD_CHAIN $BASE_DIR/$RELEASE/bin/blockchain" >> $UPDATE
 echo "sudo systemctl start heatLedger" >> $UPDATE
 sudo chmod +x $UPDATE
 
