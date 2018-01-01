@@ -409,7 +409,7 @@ echo "mv $VER_DIR $OLD_DIR" >> $UPDATE
 echo "mv $SCRIPT /tmp/heatScript" >> $UPDATE
 echo "/bin/bash $BASE_DIR/uninstall.sh" >> $UPDATE
 echo "mv /tmp/heatScript $INSTALL_DIR/installNode.sh" >> $UPDATE
-echo "/bin/bash $INSTALL_DIR/installNode.sh --accountNumber=$HEAT_ID --user=$HEAT_USER --key=$API_KEY --password=$PASSWORD --ipAddress=$IP_ADDRESS --walletSecret=$WALLET_SECRET --maxPeers=$MAX_PEERS --hallmark=$HAlLMARK --forceScan=true --forceValidate=true"" >> $UPDATE 
+echo "/bin/bash $INSTALL_DIR/installNode.sh --accountNumber=$HEAT_ID --user=$HEAT_USER --key=$API_KEY --password=$PASSWORD --ipAddress=$IP_ADDRESS --walletSecret=$WALLET_SECRET --maxPeers=$MAX_PEERS --hallmark=$HAlLMARK --forceScan=true --forceValidate=true" >> $UPDATE 
 echo "sudo systemctl stop heatLedger" >> $UPDATE
 echo "mv $OLD_DIR/bin/blockchain $BASE_DIR/$RELEASE/bin/blockchain" >> $UPDATE
 echo "sudo systemctl start heatLedger" >> $UPDATE
