@@ -400,8 +400,10 @@ echo "#!/bin/bash" >> $UPDATE
 CUR_NUM=`echo $RELEASE_NUM | tr -dc '0-9'`
 echo "CURRENT=$CUR_NUM" >> $UPDATE
 echo "RELEASE_JSON=\`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest\`" >> $UPDATE
+
 NUMSTRING="\`echo \"\$RELEASE_JSON\" | jq -r \".tag_name\" | cut -c 2-\ | tr -dc '0-9'`"
-echo "numString: $NUMSTRING"
+echo "$NUMSTRING"
+
 echo "NEWEST='$NUMSTRING'" >> $UPDATE
 echo "if [[ \$CURRENT -lt \$NEWEST ]]; then" >> $UPDATE
 echo "echo \" upgrading to version \$NEW\"" >> $UPDATE
