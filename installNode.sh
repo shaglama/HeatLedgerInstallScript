@@ -399,7 +399,7 @@ echo "#!/bin/bash" >> $UPDATE
 echo "RELEASE_JSON=curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest" >> $UPDATE
 FILESTRING="echo \$RELEASE_JSON | jq -r '.assets[0] | name'"
 echo "RELEASE_FILE=$FILESTRING" >> $UPDATE
-RELEASESTRING="echo '$RELEASE_FILE' | rev | cut -c 5- | rev" >> $UPDATE
+RELEASESTRING="echo \$RELEASE_FILE | rev | cut -c 5- | rev" >> $UPDATE
 echo "RELEASE=$RELEASESTRING" >> $UPDATE
 #echo "RELEASE=`echo '\$RELEASE_FILE' | rev | cut -c 5- | rev" >> $UPDATE
 OLD_DIR="$VER_DIR.old"
