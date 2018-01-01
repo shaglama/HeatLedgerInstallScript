@@ -5,6 +5,7 @@
 #2017
  
 #----------Vars----------------------------------------------------------------
+SCRIPT=`readlink -f $0`
 RELEASE_JSON=""=
 RELEASE_NUM="" #"2.4.0"
 RELEASE="" #"heatledger-$RELEASE_NUM"
@@ -221,7 +222,7 @@ fi
 if [[ $WALLET_SECRET = *[!\ ]* ]]; then
 	#already set
 	#URI encode it
-	ENCODED=$(encodeURIComponent "$WALLET_SECRET") &&
+	ENCODED=$(encodeURIComponent "$WALLET_SECRET")
 	#WALLET_SECRET="$ENCODED"
 else 
 	echo "WALLET_SECRET was not set in this script or passed in as an argument. WALLET_SECRET IS REQUIRED. Exiting script."
@@ -398,11 +399,11 @@ echo "#!/bin/bash" >> $UPDATE
 echo "RELEASE_JSON=`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest`" >> $UPDATE
 echo "RELEASE_FILE=`echo \$RELEASE_JSON | jq -r '.assets[0] | .name'`" >> $UPDATE
 echo "RELEASE=`echo '\$RELEASE_FILE' | rev | cut -c 5- | rev`" >> $UPDATE
-OLD_DIR="$VER_DIR" + ".old"
+OLD_DIR="$VER_DIR.old"
 echo "sudo systemctl stop heatLedger.service" >> $UPDATE
 echo "mv $VER_DIR /tmp/$OLD_DIR" >> $UPDATE 
 echo "cd $BASE_DIR" >> $UPDATE
-echo "mv $0 /temp/heatScript" >> $UPDATE
+echo "mv $SCRIPT /temp/heatScript" >> $UPDATE
 echo "/bin/bash uninstall.sh" >> $UPDATE
 echo "mv /temp/heatScript $BASE_DIR/installNode.sh" >> $UPDATE
 echo "bash installNode.sh --accountNumber=$HEAT_ID --user=$HEAT_USER --key=$API_KEY --password=$PASSWORD --ipAddress=$IP_ADDRESS --walletSecret=$WALLET_SECRET --maxPeers=$MAX_PEERS --hallmark=$HAlLMARK --forceScan=true --forceValidate=true" >> $UPDATE 
@@ -412,7 +413,7 @@ echo "sudo systemctl start heatLedger" >> $UPDATE
 sudo chmod +x $UPDATE
 
 #load service
-cp $0 $BASE_DIR/installNode.sh
+cp $SCRIPT $BASE_DIR/installNode.sh
 sudo cp $SVC $SYS_SVC &&
 sudo systemctl daemon-reload &&
 sudo systemctl enable heatLedger.service &&
