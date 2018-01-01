@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.4.10
+#Version 0.1.4.11
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #2017
@@ -397,7 +397,17 @@ sudo chmod +x $UNINSTALL
 #create update script
 touch $UPDATE
 echo "#!/bin/bash" >> $UPDATE
+CUR_NUM=`echo $RELEASE_NUM | tr -dc '0-9'`
+echo "CURRENT=$CUR_NUM" >> $UPDATE
 echo "RELEASE_JSON=\`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest\`" >> $UPDATE
+NUMSTRING="\`echo \"\$RELEASE_JSON\" | jq -r \".tag_name\" | cut -c 2-\ | tr -dc '0-9'`"
+echo "NEW=$NUMSTRING" >> $UPDATE
+echo "if [[ $CURRENT -lt $NEW ]]; then" >> $UPDATE
+echo "echo \" upgrading to version \$NEW\"" >> $UPDATE
+echo "else" >> $UPDATE
+echo "echo \"Software is already the latest version\"" >> $UPDATE
+echo "exit 0" >> $UPDATE
+echo "fi" >> $UPDATE
 FILESTRING="\`echo \"\$RELEASE_JSON\" | jq -r '.assets[0] | .name'\`"
 echo "RELEASE_FILE=$FILESTRING" >> $UPDATE
 RELEASESTRING="\`echo \"\$RELEASE_FILE\" | rev | cut -c 5- | rev\`" >> $UPDATE
