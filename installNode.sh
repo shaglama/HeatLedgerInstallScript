@@ -308,7 +308,7 @@ echo "echo 'to detach from node while attached : hold control and press a. press
 echo "echo 'to kill node while attached: hold control and press a. press k. press y.'" >> $STRT
 #echo "touch '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid"
 echo "screen -dmS heatLedger /bin/bash $BIN &" >> $STRT
-echo "screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' > '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'">> $STRT
+echo "screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' > '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'" >> $STRT
 sudo chmod +x $STRT
 
 #create mining start script
@@ -373,6 +373,9 @@ echo "echo 'removing service file from systemd directory'" >>$UNINSTALL
 echo "sudo rm /etc/systemd/system/heatLedger.service" >> $UNINSTALL
 echo "echo 'removing HeatLedger directory'" >> $UNINSTALL
 echo "sudo rm -r $BASE_DIR" >> $UNINSTALL
+echo "echo 'kill screen containing node if service did not'" >> $UNINSTALL
+echo "SPID=`cat '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'`" >> $UNINSTALL
+echo "pkill '$SPID'" >> $UNINSTALL
 echo "echo 'Clean up any orphan processes'" >> $UNINSTALL
 echo "screen -ls 'heatLedger' | grep 'heatLedger' | (" >> $UNINSTALL
 echo "IFS=\$(printf '\t');" >> $UNINSTALL
