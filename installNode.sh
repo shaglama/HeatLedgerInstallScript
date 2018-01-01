@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.4.9
+#Version 0.1.4.10
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #2017
@@ -385,6 +385,7 @@ echo "screen -ls 'heatLedger' | grep 'heatLedger' | (" >> $UNINSTALL
 echo "IFS=\$(printf '\t');" >> $UNINSTALL
 echo "sed 's/^\$IFS//' |" >> $UNINSTALL
 echo "while read -r name stuff; do" >> $UNINSTALL
+echo "echo \"killing screen: \$name\"" >> $UNINSTALL
 echo "screen -S '\$name' -X quit" >> $UNINSTALL
 echo "done" >> $UNINSTALL
 echo ")" >> $UNINSTALL
@@ -415,7 +416,7 @@ echo "screen -ls 'heatLedger' | grep 'heatLedger' | (" >> $UPDATE
 echo "IFS=\$(printf '\t');" >> $UPDATE
 echo "sed 's/^\$IFS//' |" >> $UPDATE
 echo "while read -r name stuff; do" >> $UPDATE
-echo "killing screen: \$name" >> $UPDATE
+echo "echo \"killing screen: \$name\"" >> $UPDATE
 echo "screen -S '\$name' -X quit" >> $UPDATE
 echo "done" >> $UPDATE
 echo ")" >> $UPDATE
