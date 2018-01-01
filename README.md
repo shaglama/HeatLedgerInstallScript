@@ -38,6 +38,7 @@ Execute script with required arguments (requires sudo priveleges) examples
 
 ########################################################################################
 
+
 Example: ./installNode.sh --accountNumber="18204334369979641558" --walletSecret="THIS IS NOT A REAL WALLET SECRET"
 
 To view the output of the node: screen -s heatLedger -x
@@ -45,6 +46,8 @@ To view the output of the node: screen -s heatLedger -x
 To detach from screen session: hold ctrl and press a press d
 
 To kill screen session hold ctrl and press a press k press y
+
+
 
 The script will download the latest software, setup your config file, create a service to launch and monitor the node, and start the node in a screen session so it is easy to view from anywhere and you don't have to leave a terminal running.It will also issue the command to the node to start forging after the node is up. The script will also create several helper scripts in the same folder : 
 
@@ -63,6 +66,7 @@ delayMining -- a helper script used by the service to start mining after a delay
 
 This script started as a personal project to enable me to quickly setup nodes on vms. After I saw how much time it saved me I figured maybe it could help someone else out too. Hope you enjoy it.
 
+
 Donations welcome and greatly appreciated:
 
 Heat: shaglama@heatwallet.com 18204334369979641558
@@ -74,6 +78,7 @@ Litecoin: LfXgenZQC81sQ1kc3G5JwGCdBb8DLVY6LU
 Monero: 4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRzRNy6LdJDpKnSvgsb
 
 Dash: XbpAUN6vqPb4yrfNMCJzkdQfDTGtB4qUNA
+
 
  
  
