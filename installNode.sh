@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.4.7
+#Version 0.1.4.8
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #2017
@@ -411,6 +411,13 @@ echo "/bin/bash $BASE_DIR/uninstall.sh" >> $UPDATE
 echo "mv /tmp/heatScript $INSTALL_DIR/installNode.sh" >> $UPDATE
 echo "/bin/bash $INSTALL_DIR/installNode.sh --accountNumber='$HEAT_ID' --user='$HEAT_USER' --key='$API_KEY' --password='$PASSWORD' --ipAddress='$IP_ADDRESS' --walletSecret='$WALLET_SECRET' --maxPeers='$MAX_PEERS' --hallmark='$HAlLMARK' --forceScan='true' --forceValidate='true'" >> $UPDATE 
 echo "sudo systemctl stop heatLedger" >> $UPDATE
+echo "screen -ls 'heatLedger' | grep 'heatLedger' | (" >> $UPDATE
+echo "IFS=\$(printf '\t');" >> $UPDATE
+echo "sed 's/^\$IFS//' |" >> $UPDATE
+echo "while read -r name stuff; do" >> $UPDATE
+echo "screen -S '\$name' -X quit" >> $UPDATE
+echo "done" >> $UPDATE
+echo ")" >> $UPDATE
 echo "mv $OLD_CHAIN $BASE_DIR/$RELEASE/bin/blockchain" >> $UPDATE
 echo "sudo systemctl start heatLedger" >> $UPDATE
 sudo chmod +x $UPDATE
