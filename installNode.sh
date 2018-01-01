@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.4.6
+#Version 0.1.4.7
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #2017
@@ -404,7 +404,7 @@ echo "RELEASE=$RELEASESTRING" >> $UPDATE
 #echo "RELEASE=`echo '\$RELEASE_FILE' | rev | cut -c 5- | rev" >> $UPDATE
 OLD_CHAIN="/tmp/oldChain"
 #echo "sudo systemctl stop heatLedger.service" >> $UPDATE
-echo "cp $BIN_DIR/blockchain $OLD_CHAIN" >> $UPDATE 
+echo "cp -avr $BIN_DIR/blockchain $OLD_CHAIN" >> $UPDATE 
 #echo "cd $BASE_DIR" >> $UPDATE
 echo "mv $SCRIPT /tmp/heatScript" >> $UPDATE
 echo "/bin/bash $BASE_DIR/uninstall.sh" >> $UPDATE
