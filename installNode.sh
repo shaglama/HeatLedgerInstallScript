@@ -5,10 +5,11 @@
 #2017
  
 #----------Vars----------------------------------------------------------------
-RELEASE_NUM="2.4.0"
-RELEASE="heatledger-$RELEASE_NUM"
-RELEASE_FILE="$RELEASE.zip"
-RELEASE_URL="https://github.com/Heat-Ledger-Ltd/heatledger/releases/download/v$RELEASE_NUM/$RELEASE_FILE"
+RELEASE_JSON=""=
+RELEASE_NUM="" #"2.4.0"
+RELEASE="" #"heatledger-$RELEASE_NUM"
+RELEASE_FILE="" #"$RELEASE.zip"
+RELEASE_URL="" #"https://github.com/Heat-Ledger-Ltd/heatledger/releases/download/v$RELEASE_NUM/$RELEASE_FILE"
 
 HEAT_USER=$USER #user to run the node with, defaults to user that runs the script. to set a different user change here or pass in as argument, if user does not exist it will be created
 PASSWORD= #password for creating a new user, if new user is created without changing the password here or passing in as argument you will need to set the password yourself after running this script
@@ -32,6 +33,28 @@ encodeURIComponent() {
 }
 
 #----------Program-------------------------------------------------------------
+
+#update repos and packages and install dependencies
+#sudo add-apt-repository ppa:neurobin/ppa #
+sudo apt-get update &&
+sudo apt-get install -y default-jdk &&
+sudo apt-get install -y unzip &&
+sudo apt-get install -y screen &&
+sudo apt-get install -y curl &&
+sudo apt-get install -y jq &&
+
+#get latest release info
+RELEASE_JSON=`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest`
+RELEASE_NUM=`echo "$RELEASE_JSON" | jq -r ".tag_name" | cut -c 2-`
+RELEASE_FILE=`echo "$RELEASE_JSON" | jq -r ".assets[0] | .name"`
+RELEASE_URL=`echo "$RELEASE_JSON" | jq -r ".assets[0] | .browser_download_url"`
+RELEASE=`echo "$RELEASE_FILE" | rev | cut -c 5- | rev`
+
+echo "RELEASE: $RELEASE"
+echo "VERSION: $RELEASE_NUM"
+echo "FILE: $RELEASE_FILE"
+echo "URL: $RELEASE_URL"
+
 #get arguments
 # As long as there is at least one more argument, keep looping
 while [[ $# -gt 0 ]]; do
@@ -259,14 +282,6 @@ MINING_INFO="$BASE_DIR/miningInfo.sh"
 HELP="$BASE_DIR/help.sh"
 UNINSTALL="$BASE_DIR/uninstall.sh"
 
-
-#update repos and packages and install dependencies
-sudo apt-get update &&
-sudo apt-get install -y default-jdk &&
-sudo apt-get install -y unzip &&
-sudo apt-get install -y screen &&
-sudo apt-get install -y curl &&
-
 #download and extract heatLedger
 
 mkdir $BASE_DIR
@@ -298,7 +313,7 @@ echo "echo 'to detach from node while attached : hold control and press a. press
 echo "echo 'to kill node while attached: hold control and press a. press k. press y.'" >> $STRT
 #echo "touch '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid"
 echo "screen -dmS heatLedger /bin/bash $BIN &" >> $STRT
-echo "screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' > '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'">> $STRT
+echo "screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' > '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'" >> $STRT
 sudo chmod +x $STRT
 
 #create mining start script
