@@ -399,6 +399,7 @@ FILESTRING="\`echo \"\$RELEASE_JSON\" | jq -r '.assets[0] | .name'\`"
 NUMSTRING="\`echo \"\$RELEASE_JSON\" | jq -r '.tag_name' | cut -c 2- | tr -dc '0-9'\`"
 RELEASESTRING="\`echo \"\$RELEASE_FILE\" | rev | cut -c 5- | rev\`"
 CUR_NUM=`echo $RELEASE_NUM | tr -dc '0-9'`
+OLD_CHAIN="/tmp/oldChain"
 touch $UPDATE
 echo "#!/bin/bash" >> $UPDATE
 echo "CURRENT=$CUR_NUM" >> $UPDATE
@@ -413,11 +414,17 @@ echo "exit 0" >> $UPDATE
 echo "fi" >> $UPDATE
 echo "RELEASE_FILE=$FILESTRING" >> $UPDATE
 echo "RELEASE=$RELEASESTRING" >> $UPDATE
-echo "cp -avr $BIN_DIR/blockchain $OLD_CHAIN" >> $UPDATE 
+echo "Copying blockchain to tmp" >> $UPDATE
+echo "cp -avr $BIN_DIR/blockchain $OLD_CHAIN" >> $UPDATE
+echo "Copying installer to tmp" >> $UPDATE 
 echo "mv $SCRIPT /tmp/heatScript" >> $UPDATE
+echo "Uninstalling previous version" >> $UPDATE
 echo "/bin/bash $BASE_DIR/uninstall.sh" >> $UPDATE
+echo "Restoring installer" >> $UPDATE
 echo "mv /tmp/heatScript $INSTALL_DIR/installNode.sh" >> $UPDATE
+echo "Installing new version" >> $UPDATE
 echo "/bin/bash $INSTALL_DIR/installNode.sh --accountNumber='$HEAT_ID' --user='$HEAT_USER' --key='$API_KEY' --password='$PASSWORD' --ipAddress='$IP_ADDRESS' --walletSecret='$WALLET_SECRET' --maxPeers='$MAX_PEERS' --hallmark='$HAlLMARK' --forceScan='true' --forceValidate='true'" >> $UPDATE 
+echo "Resotring blockchain" >> $UPDATE
 echo "sudo systemctl stop heatLedger" >> $UPDATE
 echo "screen -ls 'heatLedger' | grep 'heatLedger' | (" >> $UPDATE
 echo "IFS=\$(printf '\t');" >> $UPDATE
@@ -428,7 +435,9 @@ echo "screen -S '\$name' -X quit" >> $UPDATE
 echo "done" >> $UPDATE
 echo ")" >> $UPDATE
 echo "mv $OLD_CHAIN $BASE_DIR/$RELEASE/bin/blockchain" >> $UPDATE
+echo "start node" >> $UPDATE
 echo "sudo systemctl start heatLedger" >> $UPDATE
+rm /tmp/heatScript
 sudo chmod +x $UPDATE
 sudo chmod 700 $UPDATE
 
