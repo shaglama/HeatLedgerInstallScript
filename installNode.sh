@@ -45,10 +45,15 @@ sudo apt-get install -y jq &&
 
 #get latest release info
 RELEASE_JSON=`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest`
-RELEASE_NUM=`echo "$JSON" | jq -r ".tag_name" | cut -c 2-`
-RELEASE_FILE=`echo "$JSON" | jq -r ".assets[0] | .name"`
-RELEASE_URL=`echo "$JSON" | jq -r ".assets[0] | .browser_download_url"`
+RELEASE_NUM=`echo "$RELEASE_JSON" | jq -r ".tag_name" | cut -c 2-`
+RELEASE_FILE=`echo "$RELEASE_JSON" | jq -r ".assets[0] | .name"`
+RELEASE_URL=`echo "$RELEASE_JSON" | jq -r ".assets[0] | .browser_download_url"`
 RELEASE=`echo "$RELEASE_FILE" | rev | cut -c 5- | rev`
+
+echo "RELEASE: $RELEASE"
+echo "VERSION: $RELEASE_NUM"
+echo "FILE: $RELEASE_FILE"
+echo "URL: $RELEASE_URL"
 
 #get arguments
 # As long as there is at least one more argument, keep looping
@@ -373,9 +378,6 @@ echo "echo 'removing service file from systemd directory'" >>$UNINSTALL
 echo "sudo rm /etc/systemd/system/heatLedger.service" >> $UNINSTALL
 echo "echo 'removing HeatLedger directory'" >> $UNINSTALL
 echo "sudo rm -r $BASE_DIR" >> $UNINSTALL
-echo "echo 'kill screen containing node if service did not'" >> $UNINSTALL
-echo "SPID=`cat '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'`" >> $UNINSTALL
-echo "pkill '$SPID'" >> $UNINSTALL
 echo "echo 'Clean up any orphan processes'" >> $UNINSTALL
 echo "screen -ls 'heatLedger' | grep 'heatLedger' | (" >> $UNINSTALL
 echo "IFS=\$(printf '\t');" >> $UNINSTALL
