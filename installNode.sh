@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.4.3
+#Version 0.1.4.4
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #2017
