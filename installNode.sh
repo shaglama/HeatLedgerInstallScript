@@ -1,8 +1,8 @@
 #!/bin/bash
-#Version 0.1.4.14
+#Version 0.1.5
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
-#2017
+#January 1 2018
  
 #----------Vars----------------------------------------------------------------
 SCRIPT=`readlink -f $0`
@@ -325,6 +325,7 @@ echo "Starting Forging" >> startMining.log
 echo date >> startMining.log
 echo "curl -k -s http://localhost:7733/api/v1/mining/start/$ENCODED\?api_key=$API_KEY >> startMining.log" >> $STRT_MINING
 sudo chmod +x $STRT_MINING
+sudo chmod 700 $STRT_MINING
 
 #create mining delay script
 touch $DELY_MINING
@@ -340,6 +341,7 @@ echo "echo 'Mining Info' >> miningInfo.log" >> $MINING_INFO
 echo "date >> miningInfo.log" >> $MINING_INFO
 echo "curl -k -s http://localhost:7733/api/v1/mining/info/$ENCODED\?api_key=$API_KEY >> miningInfo.log" >> $MINING_INFO
 sudo chmod +x $MINING_INFO
+sudo chmod 700 $MINING_INFO
 
 #create help script
 touch $HELP
@@ -392,34 +394,26 @@ echo ")" >> $UNINSTALL
 echo "echo 'Finished uninstalling HeatLedger'" >> $UNINSTALL
 sudo chmod +x $UNINSTALL
 
-#create get latest release info script
-
 #create update script
+FILESTRING="\`echo \"\$RELEASE_JSON\" | jq -r '.assets[0] | .name'\`"
+NUMSTRING="\`echo \"\$RELEASE_JSON\" | jq -r '.tag_name' | cut -c 2- | tr -dc '0-9'\`"
+RELEASESTRING="\`echo \"\$RELEASE_FILE\" | rev | cut -c 5- | rev\`"
+CUR_NUM=`echo $RELEASE_NUM | tr -dc '0-9'`
 touch $UPDATE
 echo "#!/bin/bash" >> $UPDATE
-CUR_NUM=`echo $RELEASE_NUM | tr -dc '0-9'`
 echo "CURRENT=$CUR_NUM" >> $UPDATE
 echo "RELEASE_JSON=\`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest\`" >> $UPDATE
-
-NUMSTRING="\`echo \"\$RELEASE_JSON\" | jq -r \".tag_name\" | cut -c 2- | tr -dc '0-9'`"
-echo $NUMSTRING
-echo "NEWEST=$NUMSTRING" >> UPDATE
-#echo "NEWEST=\`echo \"$RELEASE_JSON\" | jq -r '.tag_name' | cut -c 2-
+echo "NUMSTRING=$NUMSTRING" >> $UPDATE
+echo "NEWEST=\$NUMSTRING" >> $UPDATE
 echo "if [[ \$CURRENT -lt \$NEWEST ]]; then" >> $UPDATE
-echo "echo \" upgrading to version \$NEW\"" >> $UPDATE
+echo "echo \" upgrading to version \$NEWEST\"" >> $UPDATE
 echo "else" >> $UPDATE
 echo "echo \"Software is already the latest version\"" >> $UPDATE
 echo "exit 0" >> $UPDATE
 echo "fi" >> $UPDATE
-FILESTRING="\`echo \"\$RELEASE_JSON\" | jq -r '.assets[0] | .name'\`"
 echo "RELEASE_FILE=$FILESTRING" >> $UPDATE
-RELEASESTRING="\`echo \"\$RELEASE_FILE\" | rev | cut -c 5- | rev\`" >> $UPDATE
 echo "RELEASE=$RELEASESTRING" >> $UPDATE
-#echo "RELEASE=`echo '\$RELEASE_FILE' | rev | cut -c 5- | rev" >> $UPDATE
-OLD_CHAIN="/tmp/oldChain"
-#echo "sudo systemctl stop heatLedger.service" >> $UPDATE
 echo "cp -avr $BIN_DIR/blockchain $OLD_CHAIN" >> $UPDATE 
-#echo "cd $BASE_DIR" >> $UPDATE
 echo "mv $SCRIPT /tmp/heatScript" >> $UPDATE
 echo "/bin/bash $BASE_DIR/uninstall.sh" >> $UPDATE
 echo "mv /tmp/heatScript $INSTALL_DIR/installNode.sh" >> $UPDATE
@@ -436,6 +430,7 @@ echo ")" >> $UPDATE
 echo "mv $OLD_CHAIN $BASE_DIR/$RELEASE/bin/blockchain" >> $UPDATE
 echo "sudo systemctl start heatLedger" >> $UPDATE
 sudo chmod +x $UPDATE
+sudo chmod 700 $UPDATE
 
 #load service
 cp $SCRIPT $BASE_DIR/installNode.sh
