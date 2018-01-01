@@ -396,17 +396,17 @@ sudo chmod +x $UNINSTALL
 #create update script
 touch $UPDATE
 echo "#!/bin/bash" >> $UPDATE
-echo "RELEASE_JSON=curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest" >> $UPDATE
-FILESTRING="echo \$RELEASE_JSON | jq -r '.assets[0] | name'"
+echo "RELEASE_JSON=\`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest\`" >> $UPDATE
+FILESTRING="\`echo \$RELEASE_JSON | jq -r '.assets[0] | name'\`"
 echo "RELEASE_FILE=$FILESTRING" >> $UPDATE
-RELEASESTRING="echo \$RELEASE_FILE | rev | cut -c 5- | rev" >> $UPDATE
+RELEASESTRING="\`echo \$RELEASE_FILE | rev | cut -c 5- | rev\`" >> $UPDATE
 echo "RELEASE=$RELEASESTRING" >> $UPDATE
 #echo "RELEASE=`echo '\$RELEASE_FILE' | rev | cut -c 5- | rev" >> $UPDATE
 OLD_DIR="$VER_DIR.old"
 echo "sudo systemctl stop heatLedger.service" >> $UPDATE
 echo "mv $VER_DIR /tmp/$OLD_DIR" >> $UPDATE 
 echo "cd $BASE_DIR" >> $UPDATE
-echo "mv $SCRIPT /temp/heatScript" >> $UPDATE
+echo "mv $SCRIPT /tmp/heatScript" >> $UPDATE
 echo "/bin/bash uninstall.sh" >> $UPDATE
 echo "mv /temp/heatScript $BASE_DIR/installNode.sh" >> $UPDATE
 echo "bash installNode.sh --accountNumber=$HEAT_ID --user=$HEAT_USER --key=$API_KEY --password=$PASSWORD --ipAddress=$IP_ADDRESS --walletSecret=$WALLET_SECRET --maxPeers=$MAX_PEERS --hallmark=$HAlLMARK --forceScan=true --forceValidate=true" >> $UPDATE 
