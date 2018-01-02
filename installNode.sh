@@ -1,17 +1,17 @@
 #!/bin/bash
-#Version 0.1.5
+#Version 0.1.5.1
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
-#January 1 2018
+#January 2 2018
  
 #----------Vars----------------------------------------------------------------
 SCRIPT=`readlink -f $0`
-RELEASE_JSON=""=
-RELEASE_NUM="" #"2.4.0"
-RELEASE="" #"heatledger-$RELEASE_NUM"
-RELEASE_FILE="" #"$RELEASE.zip"
-RELEASE_URL="" #"https://github.com/Heat-Ledger-Ltd/heatledger/releases/download/v$RELEASE_NUM/$RELEASE_FILE"
-
+RELEASE_JSON=""= #json returned from polling github for newest release, set automatically
+RELEASE_NUM="" #heatledger version number, set automatically
+RELEASE="" #heatledger release name, set automatically
+RELEASE_FILE="" #the heatledger file, set automatically
+RELEASE_URL="" #the url to download heatledger from, set automatically
+SNAPSHOT_URL="https://heatbrowser.com/blockchain.tgz" #the url where heatledger blockchain snapshots are hosted
 HEAT_USER=$USER #user to run the node with, defaults to user that runs the script. to set a different user change here or pass in as argument, if user does not exist it will be created
 PASSWORD= #password for creating a new user, if new user is created without changing the password here or passing in as argument you will need to set the password yourself after running this script
 API_KEY="changeMePlease" #Default api key, please change or pass in as argument
@@ -22,6 +22,7 @@ MAX_PEERS=500 #number of peers node should connect to,set here or pass as argume
 HALLMARK="" #the node hallmark, increases forging profits, set here or pass in as argument, if not set script will attempt to create a new hallmark for the node
 FORCE_SCAN="false" #if set to true node will be configured to rescan blockchain
 FORCE_VALIDATE="false" #if set to true node will be configured to revalidate transactions on the blockchain
+USE_SNAPSHOT="false" #if set to true, a snapshot of the blockchain will be downloaded from heatbrowser.com
 CURRENT_DATE="" #No need to set this, its automatically obtained
 
 
@@ -119,6 +120,11 @@ while [[ $# -gt 0 ]]; do
 			shift
 			FORCE_VALIDATE="$1"
 			;;
+			
+			-d|--downloadSnapshot)
+			shift
+			USE_SNAPSHOT="$1"
+			;;
 			      
         # This is an arg=value type option. Will catch -u=userName or --user=userName
         -u=*|--user=*)
@@ -164,6 +170,10 @@ while [[ $# -gt 0 ]]; do
 			FORCE_VALIDATE="${key#*=}"
 			;;        
         
+        	-d=*|--downloadSnapshot=*)
+        	USE_SNAPSHOT="${key#*=}"
+        	;;
+        	
         *)
         # Do whatever you want with extra options
         echo "Unknown option '$key'"
@@ -251,6 +261,17 @@ else
 	exit 1		
 fi
 
+##Verify USE_SNAPSHOT
+#Convert to lower case
+US_LC=`echo $USE_SNAPSHOT | sed 's/.*/\L&/'`
+if [[ "$US_LC" == "true" || "$US_LC" == "false" ]]; then
+	USE_SNAPSHOT="$US_LC"
+	echo "Use snapshot: $USE_SNAPSHOT"
+else
+	echo "$USE_SNAPSHOT is invalid value for Download Snapshot (USE_SNAPSHOT). Valid values are true and false"
+	exit 1		
+fi
+
 ##GET HALLMARK HERE
 if [[ $HALLMARK = *[!\ ]* ]]; then
 	#already set
@@ -290,11 +311,19 @@ mkdir $BASE_DIR
 cd $BASE_DIR
 wget $RELEASE_URL &&
 unzip $RELEASE_FILE &&
-cd "$VER_DIR" 
+cd "$VER_DIR"
 
+#download snapshot if neccessary
+if [[ "$USE_SNAPSHOT" == "true" ]]; then
+	cd $BIN_DIR
+	wget $SNAPSHOT_URL
+	tar -zxvf blockchain.tgz
+	rm blockchain.tgz
+fi
+	
 #create config file
 touch $CONF 
-echo "heat.apiKey=$API_KEY" >> $CONF 
+echo "heat.apiKey=$API_KEY" > $CONF 
 echo "heat.myAddress=$IP_ADDRESS" >> $CONF
 echo "heat.myPlatform=$HEAT_ID" >> $CONF
 echo "heat.maxNumberOfConnectedPublicPeers=$MAX_PEERS" >> $CONF
@@ -308,19 +337,19 @@ cat $CONF
 
 #create start script
 touch $STRT
-echo "#!/bin/bash" >> $STRT
+echo "#!/bin/bash" > $STRT
 echo "echo 'Starting node'" >>$STRT
 echo "echo 'to attach to node : in terminal type  	screen -s heatLedger'" >> $STRT
 echo "echo 'to detach from node while attached : hold control and press a. press d'" >> $STRT
 echo "echo 'to kill node while attached: hold control and press a. press k. press y.'" >> $STRT
 #echo "touch '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid"
 echo "screen -dmS heatLedger /bin/bash $BIN &" >> $STRT
-echo "screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' > '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'" >> $STRT
+echo "screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' >! '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'" >> $STRT #use >! to ignore noclobber
 sudo chmod +x $STRT
 
 #create mining start script
 touch $STRT_MINING
-echo "#!/bin/bash" >> $STRT_MINING
+echo "#!/bin/bash" > $STRT_MINING
 echo "Starting Forging" >> startMining.log
 echo date >> startMining.log
 echo "curl -k -s http://localhost:7733/api/v1/mining/start/$ENCODED\?api_key=$API_KEY >> startMining.log" >> $STRT_MINING
@@ -329,14 +358,14 @@ sudo chmod 700 $STRT_MINING
 
 #create mining delay script
 touch $DELY_MINING
-echo "#!/bin/bash" >> $DELY_MINING
+echo "#!/bin/bash" > $DELY_MINING
 echo "sleep 1h &&" >> $DELY_MINING 
 echo "./startMining.sh" >> $DELY_MINING
 sudo chmod +x $DELY_MINING
 
 #create mining info script
 touch $MINING_INFO
-echo "#!/bin/bash" >> $MINING_INFO
+echo "#!/bin/bash" > $MINING_INFO
 echo "echo 'Mining Info' >> miningInfo.log" >> $MINING_INFO
 echo "date >> miningInfo.log" >> $MINING_INFO
 echo "curl -k -s http://localhost:7733/api/v1/mining/info/$ENCODED\?api_key=$API_KEY >> miningInfo.log" >> $MINING_INFO
@@ -355,7 +384,7 @@ sudo chmod +x $HELP
 
 #create service
 touch $SVC
-echo "[Unit]" >> $SVC
+echo "[Unit]" > $SVC
 echo "Description=Start HeatLedger Node" >> $SVC
 echo "Wants=network.target" >> $SVC
 echo "After=network.target" >> $SVC
@@ -373,7 +402,7 @@ echo "WantedBy=multi-user.target" >> $SVC
 
 #create uninstall script
 touch $UNINSTALL
-echo "#!/bin/bash" >> $UNINSTALL
+echo "#!/bin/bash" > $UNINSTALL
 echo "echo 'stopping heatLedger service'" >> $UNINSTALL
 echo "sudo systemctl stop heatLedger.service" >> $UNINSTALL
 echo "echo 'disabling heatLedger service'" >> $UNINSTALL
@@ -401,7 +430,7 @@ RELEASESTRING="\`echo \"\$RELEASE_FILE\" | rev | cut -c 5- | rev\`"
 CUR_NUM=`echo $RELEASE_NUM | tr -dc '0-9'`
 OLD_CHAIN="/tmp/oldChain"
 touch $UPDATE
-echo "#!/bin/bash" >> $UPDATE
+echo "#!/bin/bash" > $UPDATE
 echo "CURRENT=$CUR_NUM" >> $UPDATE
 echo "RELEASE_JSON=\`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest\`" >> $UPDATE
 echo "NUMSTRING=$NUMSTRING" >> $UPDATE

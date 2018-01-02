@@ -1,4 +1,4 @@
-Heat Ledger Install Script v 0.1.5 Randy Hoggard January 1, 2018
+Heat Ledger Install Script v 0.1.5.1 Randy Hoggard January 2, 2018
 
 This script will install the latest Heat Ledger node software on an ubuntu machine, get a hallmark for the node, and start forging. It also creates a helper script for upgrading the node that can currently be run manually. Future releases will enable the script to automatically check for upgrades and apply them. It has been minimally tested on Ubuntu 16.04. It is still in the early stages at this moment and any feedback on compatibility with other version of ubuntu or any problems encountered or any features you think are missing are greatly appreciated. If you'd like to contribute to this project, please feel welcome.
 
@@ -12,7 +12,7 @@ Execute script with required arguments (requires sudo priveleges) examples
 
 ./installNode.sh --accountNumber="accountNumberHere" --walletSecret="wallet secret goes here"
 
-./installNode.sh --accountNumber="accountNumberHere" --walletSecret="wallet secret goes here" --key="apiKeyForNodeHere" --user="UserToRunNode" --password="passwordOfUserToRunNode" --hallmark="hallmarkHere" --ipAddress="ipHere" --maxPeers="500" --forceScan="true" --forceValidate="true"
+./installNode.sh --accountNumber="accountNumberHere" --walletSecret="wallet secret goes here" --key="apiKeyForNodeHere" --user="UserToRunNode" --password="passwordOfUserToRunNode" --hallmark="hallmarkHere" --ipAddress="ipHere" --maxPeers="500" --forceScan="true" --forceValidate="true" --downloadSnapshot="true"
 
 ########################################################################################
 
@@ -35,6 +35,8 @@ Execute script with required arguments (requires sudo priveleges) examples
 --forceScan if set to true will configure the node to rescan the blockchain, defaults to false --OPTIONAL
 
 --forceValidate if set to true will configure the node to revalidate the transactions on the chain, defaults to false --OPTIONAL
+
+--downloadSnapshot if set to true will download and install a snapshot of the blockchain from heatbrowser.com, minimizing chain download time --OPTIONAL
 
 ########################################################################################
 
