@@ -1,8 +1,8 @@
 #!/bin/bash
-#Version 0.1.5
+#Version 0.1.5.1
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
-#January 1 2018
+#January 2 2018
  
 #----------Vars----------------------------------------------------------------
 SCRIPT=`readlink -f $0`
@@ -323,7 +323,7 @@ fi
 	
 #create config file
 touch $CONF 
-echo "heat.apiKey=$API_KEY" >> $CONF 
+echo "heat.apiKey=$API_KEY" > $CONF 
 echo "heat.myAddress=$IP_ADDRESS" >> $CONF
 echo "heat.myPlatform=$HEAT_ID" >> $CONF
 echo "heat.maxNumberOfConnectedPublicPeers=$MAX_PEERS" >> $CONF
@@ -337,7 +337,7 @@ cat $CONF
 
 #create start script
 touch $STRT
-echo "#!/bin/bash" >> $STRT
+echo "#!/bin/bash" > $STRT
 echo "echo 'Starting node'" >>$STRT
 echo "echo 'to attach to node : in terminal type  	screen -s heatLedger'" >> $STRT
 echo "echo 'to detach from node while attached : hold control and press a. press d'" >> $STRT
@@ -349,7 +349,7 @@ sudo chmod +x $STRT
 
 #create mining start script
 touch $STRT_MINING
-echo "#!/bin/bash" >> $STRT_MINING
+echo "#!/bin/bash" > $STRT_MINING
 echo "Starting Forging" >> startMining.log
 echo date >> startMining.log
 echo "curl -k -s http://localhost:7733/api/v1/mining/start/$ENCODED\?api_key=$API_KEY >> startMining.log" >> $STRT_MINING
@@ -358,14 +358,14 @@ sudo chmod 700 $STRT_MINING
 
 #create mining delay script
 touch $DELY_MINING
-echo "#!/bin/bash" >> $DELY_MINING
+echo "#!/bin/bash" > $DELY_MINING
 echo "sleep 1h &&" >> $DELY_MINING 
 echo "./startMining.sh" >> $DELY_MINING
 sudo chmod +x $DELY_MINING
 
 #create mining info script
 touch $MINING_INFO
-echo "#!/bin/bash" >> $MINING_INFO
+echo "#!/bin/bash" > $MINING_INFO
 echo "echo 'Mining Info' >> miningInfo.log" >> $MINING_INFO
 echo "date >> miningInfo.log" >> $MINING_INFO
 echo "curl -k -s http://localhost:7733/api/v1/mining/info/$ENCODED\?api_key=$API_KEY >> miningInfo.log" >> $MINING_INFO
@@ -384,7 +384,7 @@ sudo chmod +x $HELP
 
 #create service
 touch $SVC
-echo "[Unit]" >> $SVC
+echo "[Unit]" > $SVC
 echo "Description=Start HeatLedger Node" >> $SVC
 echo "Wants=network.target" >> $SVC
 echo "After=network.target" >> $SVC
@@ -402,7 +402,7 @@ echo "WantedBy=multi-user.target" >> $SVC
 
 #create uninstall script
 touch $UNINSTALL
-echo "#!/bin/bash" >> $UNINSTALL
+echo "#!/bin/bash" > $UNINSTALL
 echo "echo 'stopping heatLedger service'" >> $UNINSTALL
 echo "sudo systemctl stop heatLedger.service" >> $UNINSTALL
 echo "echo 'disabling heatLedger service'" >> $UNINSTALL
@@ -430,7 +430,7 @@ RELEASESTRING="\`echo \"\$RELEASE_FILE\" | rev | cut -c 5- | rev\`"
 CUR_NUM=`echo $RELEASE_NUM | tr -dc '0-9'`
 OLD_CHAIN="/tmp/oldChain"
 touch $UPDATE
-echo "#!/bin/bash" >> $UPDATE
+echo "#!/bin/bash" > $UPDATE
 echo "CURRENT=$CUR_NUM" >> $UPDATE
 echo "RELEASE_JSON=\`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest\`" >> $UPDATE
 echo "NUMSTRING=$NUMSTRING" >> $UPDATE
