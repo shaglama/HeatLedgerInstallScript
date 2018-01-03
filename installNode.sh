@@ -352,8 +352,8 @@ else
 	screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' > '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'
 fi
 " >> $STRT
-echo sudo chmod +x $STRT
-echo sudo chmod 700 $STRT
+sudo chmod +x $STRT
+sudo chmod 700 $STRT
 
 
 #echo "#!/bin/bash" > $STRT
