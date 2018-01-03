@@ -414,7 +414,7 @@ else
         echo \"true\"
 fi\
 " > $IS_SYNCED
-sudo chmod +x $$IS_SYNCED
+sudo chmod +x $IS_SYNCED
 sudo chmod 700 $IS_SYNCED
 
 
