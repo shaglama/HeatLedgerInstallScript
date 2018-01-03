@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.5.8
+#Version 0.1.5.9
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #January 3 2018
@@ -424,7 +424,8 @@ sudo chmod 700 $STRT_MINING
 #create mining delay script
 echo "\
 #!/bin/bash
-INTERVAL=5m
+INTERVAL=10m
+sleep \$INTERVAL
 SYNCED=\`./isSynced.sh\`
 while [[ \$SYNCED == 'false' ]]
 do
