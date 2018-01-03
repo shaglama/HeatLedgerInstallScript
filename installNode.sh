@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.5.4
+#Version 0.1.5.5
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #January 3 2018
@@ -350,7 +350,7 @@ else
 	echo 'to kill node while attached: hold control and press a. press k. press y.'
 	screen -dmS heatLedger /bin/bash $BIN &
 	screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' > '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'
-fi
+fi\
 " >> $STRT
 sudo chmod +x $STRT
 sudo chmod 700 $STRT
@@ -475,7 +475,7 @@ sudo chmod 700 $DELY_MINING
 #create mining info script
 echo "\
 #!/bin/bash
-INFO=\`curl -k -s http://localhost:7733/api/v1/mining/info/$ENCODED\?api_key=$API_KEY`
+INFO=\`curl -k -s http://localhost:7733/api/v1/mining/info/$ENCODED\?api_key=$API_KEY\`
 echo 'Mining Info' > miningInfo.log
 echo date >> miningInfo.log
 echo \$INFO | tee -a miningInfo.log\
