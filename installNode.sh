@@ -473,13 +473,27 @@ sudo chmod 700 $DELY_MINING
 
 
 #create mining info script
-touch $MINING_INFO
-echo "#!/bin/bash" > $MINING_INFO
-echo "echo 'Mining Info' >> miningInfo.log" >> $MINING_INFO
-echo "date >> miningInfo.log" >> $MINING_INFO
-echo "curl -k -s http://localhost:7733/api/v1/mining/info/$ENCODED\?api_key=$API_KEY | tee miningInfo.log" >> $MINING_INFO
+echo "\
+#!/bin/bash
+INFO=\`curl -k -s http://localhost:7733/api/v1/mining/info/$ENCODED\?api_key=$API_KEY`
+echo 'Mining Info' > miningInfo.log
+echo date >> miningInfo.log
+echo \$INFO | tee -a miningInfo.log\
+" > $MINING_INFO
 sudo chmod +x $MINING_INFO
 sudo chmod 700 $MINING_INFO
+
+
+
+
+#create mining info script
+#touch $MINING_INFO
+#echo "#!/bin/bash" > $MINING_INFO
+#echo "echo 'Mining Info' >> miningInfo.log" >> $MINING_INFO
+#echo "date >> miningInfo.log" >> $MINING_INFO
+#echo "curl -k -s http://localhost:7733/api/v1/mining/info/$ENCODED\?api_key=$API_KEY | tee miningInfo.log" >> $MINING_INFO
+#sudo chmod +x $MINING_INFO
+#sudo chmod 700 $MINING_INFO
 
 #create help script
 touch $HELP
