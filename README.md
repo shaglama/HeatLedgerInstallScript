@@ -1,4 +1,4 @@
-Heat Ledger Install Script v 0.1.5.1 Randy Hoggard January 2, 2018
+Heat Ledger Install Script v 0.1.5.9 Randy Hoggard January 3, 2018
 
 This script will install the latest Heat Ledger node software on an ubuntu machine, get a hallmark for the node, and start forging. It also creates a helper script for upgrading the node that can currently be run manually. Future releases will enable the script to automatically check for upgrades and apply them. It has been minimally tested on Ubuntu 16.04. It is still in the early stages at this moment and any feedback on compatibility with other version of ubuntu or any problems encountered or any features you think are missing are greatly appreciated. If you'd like to contribute to this project, please feel welcome.
 
@@ -57,14 +57,18 @@ uninstall.sh -- removes all changes made by the script
 
 update.sh -- checks for latest release, and upgrades if needed
 
-miningInfo -- polls node for mining info and writes it to miningInfo.log
+status.sh -- displays information about the node and blockchain
 
-startMining -- issues the command to start mining to the node, the script is called automatically after 1 hour of node starting, no need to use this unless forging fails to start after one hour or you wish to start earlier
+isSynced.sh -- returns true or false depending on whether the node is synced
 
-startHeatLedger -- starts the node, is called automatically by the service that monitors the node, no need to use this unless service is not working properly
+miningInfo.sh -- polls node for mining info displays it, and  writes it to miningInfo.log
+
+startMining.sh -- issues the command to start mining to the node, the script is called automatically after 1 hour of node starting, no need to use this unless forging fails to start after one hour or you wish to start earlier
+
+startHeatLedger.sh -- starts the node, is called automatically by the service that monitors the node, no need to use this unless service is not working properly
 
 delayMining -- a helper script used by the service to start mining after a delay. No need to use this. 
-
+status.sh
 
 This script started as a personal project to enable me to quickly setup nodes on vms. After I saw how much time it saved me I figured maybe it could help someone else out too. Hope you enjoy it.
 
