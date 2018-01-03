@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.5.9
+#Version 0.1.5.11
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #January 3 2018
@@ -45,6 +45,7 @@ sudo apt-get install -y screen &&
 sudo apt-get install -y curl && 
 sudo apt-get install -y jq && #to parse JSON
 sudo apt-get install -y bc && #for math
+sudo apt-get install -y dbus #needed for some installs, not sure why its missing in those variations, need to investigate further
 
 #get latest release info
 RELEASE_JSON=`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest`
@@ -145,7 +146,7 @@ while [[ $# -gt 0 ]]; do
 			
 			-i=*|--ipAddress=*)
 			IP_ADDRESS="${key#*=}"
-			;;
+			;;RemainAfterExit=yes
 			
 			-a=*|--accountNumber=*)
 			HEAT_ID="${key#*=}"
@@ -359,7 +360,7 @@ sudo chmod 700 $STRT
 echo "\
 #!/bin/bash
 JSON=\`curl -s https://heatwallet.com/status2.cgi\` > /dev/null
-CHAINHEIGHT=\`echo \$JSON | jq -r '.lastBlockchainFeederHeight' | tr -dc '0-9'\`
+CHAINHEIGHT=\`echo \$JSON | jq -r 'RemainAfterExit=yes.lastBlockchainFeederHeight' | tr -dc '0-9'\`
 CHAINBLOCK=\`echo \$JSON | jq -r '.lastBlock'\`
 CHAINBLOCK_TIME=\`echo \$JSON | jq -r '.lastBlockTimestamp'\`
 JSON=\`curl -s -X GET --header 'Accept: application/json' 'http://localhost:7733/api/v1/blockchain/status'\` > /dev/null
@@ -470,9 +471,10 @@ echo "PIDFile='/home/$HEAT_USER/HeatLedger/startHeadLedger.pid'" >> $SVC
 echo "User=$HEAT_USER" >> $SVC
 echo "WorkingDirectory=$BIN_DIR" >> $SVC
 echo "ExecStart=/bin/bash /home/$HEAT_USER/HeatLedger/startHeatLedger.sh" >> $SVC
-echo "ExecStartPost=/bin/bash -c '/home/$HEAT_USER/HeatLedger/delayMining.sh &'" >> $SVC
+echo "ExecStartPost=/bin/bash /home/$HEAT_USER/HeatLedger/delayMining.sh" >> $SVC
 echo "Restart=always" >> $SVC
 echo "KillMode=process" >> $SVC
+echo "RemainAfterExit=yes" >> $SVC
 echo "[Install]" >> $SVC
 echo "WantedBy=default.target" >> $SVC #Use default target so service runs on boot
 
@@ -497,6 +499,7 @@ echo "screen -S '\$name' -X quit" >> $UNINSTALL
 echo "done" >> $UNINSTALL
 echo ")" >> $UNINSTALL
 echo "echo 'Finished uninstalling HeatLedger'" >> $UNINSTALL
+echo "cd .." >> $UNINSTALL
 sudo chmod +x $UNINSTALL
 
 #create update script
@@ -545,6 +548,13 @@ echo "sudo systemctl start heatLedger" >> $UPDATE
 sudo chmod +x $UPDATE
 sudo chmod 700 $UPDATE
 
+#make start service script
+#sudo systemctl --no-block start heatLedger.service
+#make stop service script
+#sudo systemctl --no-block stop heatLedger.service
+#make restart service script
+#sudo systemctl --no-block restart heatLedger.service
+
 #make copy of installer for util scripts usage
 cp $SCRIPT $BASE_DIR/installNode.sh
 
@@ -553,7 +563,7 @@ sudo cp $SVC $SYS_SVC && #copy service to systemd directory
 sudo loginctl enable-linger $HEAT_USER  #enable linger so services keep running even if user logs out
 sudo systemctl daemon-reload && #reload systemd service daemon
 sudo systemctl enable heatLedger.service && #enable the service
-sudo systemctl start heatLedger.service #start the service
+sudo systemctl --no-block start heatLedger.service #start the service
 
 
 
