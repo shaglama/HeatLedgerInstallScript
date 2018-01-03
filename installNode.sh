@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.5.9
+#Version 0.1.5.10
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #January 3 2018
@@ -45,6 +45,7 @@ sudo apt-get install -y screen &&
 sudo apt-get install -y curl && 
 sudo apt-get install -y jq && #to parse JSON
 sudo apt-get install -y bc && #for math
+sudo apt-get install -y dbus #needed for some installs, not sure why its missing in those variations, need to investigate further
 
 #get latest release info
 RELEASE_JSON=`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest`
@@ -470,9 +471,10 @@ echo "PIDFile='/home/$HEAT_USER/HeatLedger/startHeadLedger.pid'" >> $SVC
 echo "User=$HEAT_USER" >> $SVC
 echo "WorkingDirectory=$BIN_DIR" >> $SVC
 echo "ExecStart=/bin/bash /home/$HEAT_USER/HeatLedger/startHeatLedger.sh" >> $SVC
-echo "ExecStartPost=/bin/bash -c '/home/$HEAT_USER/HeatLedger/delayMining.sh &'" >> $SVC
+echo "ExecStartPost=/bin/bash /home/$HEAT_USER/HeatLedger/delayMining.sh" >> $SVC
 echo "Restart=always" >> $SVC
 echo "KillMode=process" >> $SVC
+echo "RemainAfterExit=yes" >> $SVC
 echo "[Install]" >> $SVC
 echo "WantedBy=default.target" >> $SVC #Use default target so service runs on boot
 
