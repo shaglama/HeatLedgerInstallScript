@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.5.5
+#Version 0.1.5.6
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #January 3 2018
@@ -597,7 +597,7 @@ cp $SCRIPT $BASE_DIR/installNode.sh
 
 #load service
 sudo cp $SVC $SYS_SVC && #copy service to systemd directory
-loginctl enable-linger $HEAT_USER  #enable linger so services keep running even if user logs out
+sudo loginctl enable-linger $HEAT_USER  #enable linger so services keep running even if user logs out
 sudo systemctl daemon-reload && #reload systemd service daemon
 sudo systemctl enable heatLedger.service && #enable the service
 sudo systemctl start heatLedger.service #start the service
