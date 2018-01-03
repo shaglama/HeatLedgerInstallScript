@@ -347,7 +347,7 @@ else
 	echo 'Starting node'
 	echo 'to attach to node : in terminal type  	screen -s heatLedger'
 	echo 'to detach from node while attached : hold control and press a. press d'
-	echo 'to kill node while attached: hold control and press a. press k. press y.
+	echo 'to kill node while attached: hold control and press a. press k. press y.'
 	screen -dmS heatLedger /bin/bash $BIN &
 	screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' > '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'
 fi
