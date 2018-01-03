@@ -1,8 +1,8 @@
 #!/bin/bash
-#Version 0.1.5.1
+#Version 0.1.5.3
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
-#January 2 2018
+#January 3 2018
  
 #----------Vars----------------------------------------------------------------
 SCRIPT=`readlink -f $0`
