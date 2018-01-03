@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.5.7
+#Version 0.1.5.8
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #January 3 2018
@@ -355,17 +355,6 @@ fi\
 sudo chmod +x $STRT
 sudo chmod 700 $STRT
 
-
-#echo "#!/bin/bash" > $STRT
-#echo "echo 'Starting node'" >>$STRT
-#echo "echo 'to attach to node : in terminal type  	screen -s heatLedger'" >> $STRT
-#echo "echo 'to detach from node while attached : hold control and press a. press d'" >> $STRT
-#echo "echo 'to kill node while attached: hold control and press a. press k. press y.'" >> $STRT
-####echo "touch '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid"
-#echo "screen -dmS heatLedger /bin/bash $BIN &" >> $STRT
-#echo "screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' > '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'" >> $STRT 
-#sudo chmod +x $STRT
-
 #create status script
 echo "\
 #!/bin/bash
@@ -432,18 +421,6 @@ fi\
 sudo chmod +x $STRT_MINING
 sudo chmod 700 $STRT_MINING
 
-
-
-#create mining start script
-#touch $STRT_MINING
-#echo "#!/bin/bash" > $STRT_MINING
-#echo "Starting Forging" >> startMining.log
-#echo date >> startMining.log
-#echo "curl -k -s http://localhost:7733/api/v1/mining/start/$ENCODED\?api_key=$API_KEY >> startMining.log" >> $STRT_MINING
-#sudo chmod +x $STRT_MINING
-#sudo chmod 700 $STRT_MINING
-
-
 #create mining delay script
 echo "\
 #!/bin/bash
@@ -459,19 +436,6 @@ done
 sudo chmod +x $DELY_MINING
 sudo chmod 700 $DELY_MINING
 
-
-
-
-#create mining delay script
-#touch $DELY_MINING
-#echo "#!/bin/bash" > $DELY_MINING
-#echo "INFO=\`./$MINING_INFO\`" >> $DELY_MINING
-#echo "sleep 1h &&" >> $DELY_MINING 
-#echo "./startMining.sh" >> $DELY_MINING
-#sudo chmod +x $DELY_MINING
-
-
-
 #create mining info script
 echo "\
 #!/bin/bash
@@ -482,18 +446,6 @@ echo \$INFO | tee -a miningInfo.log\
 " > $MINING_INFO
 sudo chmod +x $MINING_INFO
 sudo chmod 700 $MINING_INFO
-
-
-
-
-#create mining info script
-#touch $MINING_INFO
-#echo "#!/bin/bash" > $MINING_INFO
-#echo "echo 'Mining Info' >> miningInfo.log" >> $MINING_INFO
-#echo "date >> miningInfo.log" >> $MINING_INFO
-#echo "curl -k -s http://localhost:7733/api/v1/mining/info/$ENCODED\?api_key=$API_KEY | tee miningInfo.log" >> $MINING_INFO
-#sudo chmod +x $MINING_INFO
-#sudo chmod 700 $MINING_INFO
 
 #create help script
 touch $HELP
