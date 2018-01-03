@@ -1,8 +1,8 @@
 #!/bin/bash
-#Version 0.1.5.1
+#Version 0.1.5.9
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
-#January 2 2018
+#January 3 2018
  
 #----------Vars----------------------------------------------------------------
 SCRIPT=`readlink -f $0`
@@ -42,8 +42,9 @@ sudo apt-get update &&
 sudo apt-get install -y default-jdk &&
 sudo apt-get install -y unzip &&
 sudo apt-get install -y screen &&
-sudo apt-get install -y curl &&
-sudo apt-get install -y jq &&
+sudo apt-get install -y curl && 
+sudo apt-get install -y jq && #to parse JSON
+sudo apt-get install -y bc && #for math
 
 #get latest release info
 RELEASE_JSON=`curl -s https://api.github.com/repos/Heat-Ledger-Ltd/heatledger/releases/latest`
@@ -304,6 +305,8 @@ MINING_INFO="$BASE_DIR/miningInfo.sh"
 HELP="$BASE_DIR/help.sh"
 UNINSTALL="$BASE_DIR/uninstall.sh"
 UPDATE="$BASE_DIR/update.sh"
+STATUS="$BASE_DIR/status.sh"
+IS_SYNCED="$BASE_DIR/isSynced.sh"
 
 #download and extract heatLedger
 
@@ -336,39 +339,112 @@ echo "Configuration written: "
 cat $CONF
 
 #create start script
-touch $STRT
-echo "#!/bin/bash" > $STRT
-echo "echo 'Starting node'" >>$STRT
-echo "echo 'to attach to node : in terminal type  	screen -s heatLedger'" >> $STRT
-echo "echo 'to detach from node while attached : hold control and press a. press d'" >> $STRT
-echo "echo 'to kill node while attached: hold control and press a. press k. press y.'" >> $STRT
-#echo "touch '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid"
-echo "screen -dmS heatLedger /bin/bash $BIN &" >> $STRT
-echo "screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' > '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'" >> $STRT 
+echo "\
+#!/bin/bash
+if echo \"\$(screen -ls 'heatLedger')\" | grep -q 'heatLedger'; then
+	echo 'Failed to start heatLedger. There is already an instance running!'
+else
+	echo 'Starting node'
+	echo 'to attach to node : in terminal type  	screen -s heatLedger'
+	echo 'to detach from node while attached : hold control and press a. press d'
+	echo 'to kill node while attached: hold control and press a. press k. press y.'
+	screen -dmS heatLedger /bin/bash $BIN &
+	screen -list | grep 'heatLedger' | cut -f1 -d'.' | sed 's/\W//g' > '/home/$HEAT_USER/HeatLedger/startHeatLedger.pid'
+fi\
+" >> $STRT
 sudo chmod +x $STRT
+sudo chmod 700 $STRT
+
+#create status script
+echo "\
+#!/bin/bash
+JSON=\`curl -s https://heatwallet.com/status2.cgi\` > /dev/null
+CHAINHEIGHT=\`echo \$JSON | jq -r '.lastBlockchainFeederHeight' | tr -dc '0-9'\`
+CHAINBLOCK=\`echo \$JSON | jq -r '.lastBlock'\`
+CHAINBLOCK_TIME=\`echo \$JSON | jq -r '.lastBlockTimestamp'\`
+JSON=\`curl -s -X GET --header 'Accept: application/json' 'http://localhost:7733/api/v1/blockchain/status'\` > /dev/null
+LAST_BLOCK=\`echo \$JSON | jq -r '.lastBlock'\`
+TIMESTAMP=\`echo \$JSON | jq -r '.lastBlockTimestamp'\`
+CURRENT_TIME=\`date +%s\`
+URL=\"http://localhost:7733/api/v1/blockchain/block/\$LAST_BLOCK/false\"
+JSON=\`curl -s -X GET --header 'Accept: application/json' \$URL\` > /dev/null
+HEIGHT=\`echo \$JSON | jq -r '.height'\`
+BEHIND=\$((\$CHAINHEIGHT - \$HEIGHT))
+BEHIND_TIME=\$((\$CHAINBLOCK_TIME - \$TIMESTAMP))
+DAYS=\`echo \"\$BEHIND_TIME / (60 * 60 * 24)\" | bc -l\`
+WHOLE_DAYS=\`echo \"scale=0; \$DAYS / 1\" | bc -l\`
+HOURS=\`echo \"24 * (\$DAYS - \$WHOLE_DAYS)\" | bc -l\`
+WHOLE_HOURS=\`echo \"scale=0; \$HOURS / 1\" | bc -l\`
+MINUTES=\`echo \"scale=0;(60 * (\$HOURS - \$WHOLE_HOURS) / 1)\" | bc -l\`
+echo \"Chain Height: \$CHAINHEIGHT\"
+echo \"Node Height: \$HEIGHT\"
+echo \"\$BEHIND blocks behind\"
+echo \"\$WHOLE_DAYS days \$WHOLE_HOURS hours \$MINUTES minutes behind\"
+echo \"Current Chain Block: \$CHAINBLOCK\"
+echo \"Current Chain Timestamp: \$CHAINBLOCK_TIME\"
+echo \"Current Node Block: \$LAST_BLOCK\"
+echo \"Current Node Timestamp: \$TIMESTAMP\"
+if [[ \$TIMESTAMP -lt \$CHAINBLOCK_TIME ]]; then
+        echo \"not synced\"
+else 
+        echo \"synced\"
+fi\
+" > $STATUS
+sudo chmod +x $STATUS
+sudo chmod 700 $STATUS
+
+#create isSynced script
+echo "\
+#!/bin/bash
+RESULT=\`./status.sh | grep 'not synced'\`
+if [[ \$RESULT == 'not synced' ]]; then
+        echo \"false\"
+else
+        echo \"true\"
+fi\
+" > $IS_SYNCED
+sudo chmod +x $IS_SYNCED
+sudo chmod 700 $IS_SYNCED
+
 
 #create mining start script
-touch $STRT_MINING
-echo "#!/bin/bash" > $STRT_MINING
-echo "Starting Forging" >> startMining.log
-echo date >> startMining.log
-echo "curl -k -s http://localhost:7733/api/v1/mining/start/$ENCODED\?api_key=$API_KEY >> startMining.log" >> $STRT_MINING
+echo "\
+#!/bin/bash
+SYNCED=\`./isSynced.sh\`
+if [[ \$SYNCED == 'true' ]]; then
+        echo \"Issuing start forging command to node\"
+        curl -k -s http://localhost:7733/api/v1/mining/start/$ENCODED\?api_key=$API_KEY >> startMining.log
+else
+        echo \"Cannot start forging, node is not synced yet!!\"
+fi\
+" > $STRT_MINING
 sudo chmod +x $STRT_MINING
 sudo chmod 700 $STRT_MINING
 
 #create mining delay script
-touch $DELY_MINING
-echo "#!/bin/bash" > $DELY_MINING
-echo "sleep 1h &&" >> $DELY_MINING 
-echo "./startMining.sh" >> $DELY_MINING
+echo "\
+#!/bin/bash
+INTERVAL=10m
+sleep \$INTERVAL
+SYNCED=\`./isSynced.sh\`
+while [[ \$SYNCED == 'false' ]]
+do
+        sleep \$INTERVAL &&
+        SYNCED=\`./isSynced.sh\`
+done
+./startMining.sh\
+" > $DELY_MINING
 sudo chmod +x $DELY_MINING
+sudo chmod 700 $DELY_MINING
 
 #create mining info script
-touch $MINING_INFO
-echo "#!/bin/bash" > $MINING_INFO
-echo "echo 'Mining Info' >> miningInfo.log" >> $MINING_INFO
-echo "date >> miningInfo.log" >> $MINING_INFO
-echo "curl -k -s http://localhost:7733/api/v1/mining/info/$ENCODED\?api_key=$API_KEY >> miningInfo.log" >> $MINING_INFO
+echo "\
+#!/bin/bash
+INFO=\`curl -k -s http://localhost:7733/api/v1/mining/info/$ENCODED\?api_key=$API_KEY\`
+echo 'Mining Info' > miningInfo.log
+echo date >> miningInfo.log
+echo \$INFO | tee -a miningInfo.log\
+" > $MINING_INFO
 sudo chmod +x $MINING_INFO
 sudo chmod 700 $MINING_INFO
 
@@ -398,7 +474,7 @@ echo "ExecStartPost=/bin/bash -c '/home/$HEAT_USER/HeatLedger/delayMining.sh &'"
 echo "Restart=always" >> $SVC
 echo "KillMode=process" >> $SVC
 echo "[Install]" >> $SVC
-echo "WantedBy=multi-user.target" >> $SVC
+echo "WantedBy=default.target" >> $SVC #Use default target so service runs on boot
 
 #create uninstall script
 touch $UNINSTALL
@@ -469,12 +545,15 @@ echo "sudo systemctl start heatLedger" >> $UPDATE
 sudo chmod +x $UPDATE
 sudo chmod 700 $UPDATE
 
-#load service
+#make copy of installer for util scripts usage
 cp $SCRIPT $BASE_DIR/installNode.sh
-sudo cp $SVC $SYS_SVC &&
-sudo systemctl daemon-reload &&
-sudo systemctl enable heatLedger.service &&
-sudo systemctl start heatLedger.service
+
+#load service
+sudo cp $SVC $SYS_SVC && #copy service to systemd directory
+sudo loginctl enable-linger $HEAT_USER  #enable linger so services keep running even if user logs out
+sudo systemctl daemon-reload && #reload systemd service daemon
+sudo systemctl enable heatLedger.service && #enable the service
+sudo systemctl start heatLedger.service #start the service
 
 
 
