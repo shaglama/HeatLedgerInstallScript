@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version 0.1.5.6
+#Version 0.1.5.7
 #HEAT Ledger Bash Install Script for Ubuntu
 #Randy Hoggard
 #January 3 2018
@@ -377,7 +377,7 @@ JSON=\`curl -s -X GET --header 'Accept: application/json' 'http://localhost:7733
 LAST_BLOCK=\`echo \$JSON | jq -r '.lastBlock'\`
 TIMESTAMP=\`echo \$JSON | jq -r '.lastBlockTimestamp'\`
 CURRENT_TIME=\`date +%s\`
-URL=\"http://localhost:7733/api/v1/blockchain/block/$LAST_BLOCK/false\"
+URL=\"http://localhost:7733/api/v1/blockchain/block/\$LAST_BLOCK/false\"
 JSON=\`curl -s -X GET --header 'Accept: application/json' \$URL\` > /dev/null
 HEIGHT=\`echo \$JSON | jq -r '.height'\`
 BEHIND=\$((\$CHAINHEIGHT - \$HEIGHT))
@@ -406,7 +406,7 @@ sudo chmod 700 $STATUS
 
 #create isSynced script
 echo "\
-!#/bin/bash
+#!/bin/bash
 RESULT=\`./status.sh | grep 'not synced'\`
 if [[ \$RESULT == 'not synced' ]]; then
         echo \"false\"
