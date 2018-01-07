@@ -1,3 +1,7 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+DEPRECATED, no longer under development. Please see the new project at shaglama/fire
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 Heat Ledger Install Script v 0.1.5.11 Randy Hoggard January 3, 2018
 
 This script will install the latest Heat Ledger node software on an ubuntu machine, get a hallmark for the node, and start forging. It also creates a helper script for upgrading the node that can currently be run manually. Future releases will enable the script to automatically check for upgrades and apply them. It has been minimally tested on Ubuntu 16.04. It is still in the early stages at this moment and any feedback on compatibility with other version of ubuntu or any problems encountered or any features you think are missing are greatly appreciated. If you'd like to contribute to this project, please feel welcome.
